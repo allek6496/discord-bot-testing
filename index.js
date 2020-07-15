@@ -11,8 +11,8 @@ client.login(keys.token)
 client.on('message', message => {
     console.log(message.content);
 
-    if (message.content === ":bell:") {
-        message.channel.send(":bell: Ding Dong :bell:")
+    if (message.content === "🔔") {
+        message.channel.send("🔔 Ding Dong 🔔")
     }
 });
 
