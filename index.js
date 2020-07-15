@@ -6,7 +6,7 @@ client.once('ready', () => {
     console.log('Ready!');
 });
 
-client.login(keys.token)
+client.login(ENV['TOKEN'])
 
 client.on('message', message => {
     console.log(message.content);
