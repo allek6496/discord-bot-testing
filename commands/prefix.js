@@ -1,0 +1,24 @@
+module.exports = {
+    name: 'prefix',
+    description: 'Allows an admin to change the prefix (restricting to admin not done yet)',
+
+    /**
+     * Allows changing the prefix of the bot on a specific server.
+     * @param {Message} message The discord message object for the triggering event.
+     * @param {string Array} args The list of words following the triggering command (prefix).
+     */
+    execute(message, args) {
+        var handler = require('../configHandler');
+
+        // use the handler to grab the current prefix
+        var prefix = handler.getValue('prefix', message.guild.id);
+        
+        // if they didn't provide arguments return an error, otherwise change the prefix to the first argument
+        if (args.length == 0) {
+            message.channel.send(`You have to provide a new prefix to use.\nFor example, say << ${prefix}prefix $ >> if you wanted to change the prefix to $`);
+        } else {
+            handler.setValue('prefix', args[0], message.guild.id);
+            message.channel.send(`The prefix has been changed to ${args[0]}`)
+        }
+    }
+}
