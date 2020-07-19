@@ -1,6 +1,8 @@
 module.exports = {
     name: 'hellothere',
     description: 'Responds to the user that @tted the bot',
+    args: false,
+    guildOnly: false,
 
     /**
      * Response whenever the bot is notified.
@@ -8,6 +10,8 @@ module.exports = {
      * @param {string Array} args The list of words following the triggering command (not used).
      */
     execute(message, args) {
-        message.channel.send(`Hello there ${message.author.username}`);
+        const handler = require('../configHandler.js')
+
+        message.channel.send(`Hello ${message.author}, if you're confused how to use me, try typing ${handler.getValue('prefix')}help! :bell:`);
     }
 }

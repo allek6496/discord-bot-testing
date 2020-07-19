@@ -1,6 +1,8 @@
 module.exports = {
-    name: 'dingdong',
+    name: '🔔',
     description: 'dingdong',
+    args: false,
+    guildOnly: false,
 
     /**
      * A fun little command that responds with `ding dong` and bell emojis.
@@ -8,6 +10,6 @@ module.exports = {
      * @param {string Array} args The list of words following the triggering command (not used).
      */
     execute(message, args) {
-        message.channel.send('🔔 Ding Dong 🔔');
+        message.channel.send(':bell: Ding Dong :bell:');
     }
 }

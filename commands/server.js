@@ -1,6 +1,8 @@
 module.exports = {
     name: 'server',
     description: 'returns the name of the current server',
+    args: false,
+    guildOnly: true,
 
     /**
      * Returns the name of the current server, or guild, for tetsting purposes.

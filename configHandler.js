@@ -1,4 +1,5 @@
 const guildTemplate = {"id": false, "prefix": '~'};
+const dmSettings = {"prefix": ''};
 
 module.exports = {
     name: 'prefixHandler',
@@ -8,11 +9,19 @@ module.exports = {
      * Sets a value within a guild
      * @param {string} value The value to change
      * @param {var} newValue The new value to change it to
-     * @param {Snowflake} guildID The ID of the guild
+     * @param {Guild} guild The object representing the guild
      */
-    setValue(value, newValue, guildID) {
+    setValue(value, newValue, guild) {
+        if (guildTemplate[value] == null){
+            console.log(`Tried to set ${value} in config.json, but it doesn't exist`);
+            return false;
+        } else if (guild == null) {
+            console.log('You can\'t set value in a dm channel');
+        }
+
         const config = require('./config.json');
         const fs = require('fs');
+        const guildID = guild.id;
 
         // check if the guild exists in the json before attempting to set it
         if (config.guilds.some(guild => guild.id == guildID)) {
@@ -31,17 +40,31 @@ module.exports = {
         fs.writeFile('./config.json', JSON.stringify(config), (e) => {
             if (e) throw err;
         });
+
         return true;
     },
 
     /**
      * Gets a value from a specific guild
      * @param {string} value A string for the property you want to get
-     * @param {Snowflake} guildID The ID of the guild
+     * @param {Guild} guild The guild object the message came from, null if dm
      */
-    getValue(value, guildID) {
+    getValue(value, guild) {
+        if (guildTemplate[value] == null){
+            console.log(`Tried to read ${value} from config.json, but it doesn't exist`);
+            return null;
+        } else if (guild == null) {
+            if (dmSettings[value] == null) {
+                console.log(`${value} is not set as a default value for dm channels`);
+                return null;
+            } else {
+                return dmSettings[value];
+            }
+        }
+
         const config = require('./config.json');
         const fs = require('fs');
+        const guildID = guild.id;
 
         // if the guild exists get the value from it
         if (config.guilds.some(guild => guild.id == guildID)) {
@@ -64,11 +87,17 @@ module.exports = {
 
     /**
      * Removes a guild from the json file after it's no longer needed.
-     * @param {Snowflake} guildID The ID of the guild to remove.
+     * @param {Guild} guild The ID of the guild to remove.
      */
-    deleteGuild(guildID) {
+    deleteGuild(guild) {
+        if (guild == null) {
+            console.log('Tried to delete a dm channel')
+            return false;
+        }
+
         const config = require('./config.json');
         const fs = require('fs');
+        const guildID = guild.id;
 
         // if the guild exists get the value from it
         if (config.guilds.some(guild => guild.id == guildID)) {
@@ -88,7 +117,8 @@ module.exports = {
 
         // if it doesn't exist then there's nothing to do
         } else {
-            return true;
+            console.log(`Tried to delete a guild named ${guild.name} that doesn\'t exist yet`);
+            return false;
         }
     }
 }

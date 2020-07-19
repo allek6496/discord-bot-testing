@@ -1,6 +1,9 @@
 module.exports = {
     name: 'prefix',
     description: 'Allows an admin to change the prefix (restricting to admin not done yet)',
+    args: true,
+    usage: '<new prefix>',
+    guildOnly: true,
 
     /**
      * Allows changing the prefix of the bot on a specific server.

@@ -28,44 +28,52 @@ for (const file of commandFiles) {
 }
 
 client.on('message', message => {
-    var prefix = handler.getValue('prefix', message.guild.id);
-    
-    // prevent the bot from responding to it's own messages, and possibly entering a loop
-    if (message.author.id == client.user.id) {
-        return;
+    // prevent bot from responding to own messages
+    if (message.author.id == client.user.id) return;
+
+    // there's currently no option to change prefix in a dm channel
+    if (message.channel.type === 'text') {
+        var prefix = handler.getValue('prefix', message.guild.id);
+    } else {
+        var prefix = ''
     }
 
     // parse the message info to get both the command and the arguments for that command
     const args = message.content.slice(prefix.length).trim().split(' ').map(arg => arg.toLowerCase());
-    const command = args.shift();
+    const commandName = args.shift();
 
-    // if they send just a bell emoji, respond with two bell emojis and "Ding Dong"
-    // note command doesn't work because there's no prefix here
+    // first check for special commands not requiring the prefix
     if (message.content === '🔔') {
-        client.commands.get('dingdong').execute(message, args);
+        // if they send just a bell emoji, respond with two bell emojis and "Ding Dong"
+        // note command doesn't work because there's no prefix here
+        client.commands.get('🔔').execute(message, args);
         
-    // checks if the bot was @tted
     } else if (message.mentions.has(client.user)) {
+        // checks if the bot was @tted
         client.commands.get('hellothere').execute(message, args);
 
     } else {
-        if (!client.commands.has(command)) return;
+        if (!client.commands.has(commandName)) return;
+        if (message.content.slice(0, prefix.length) != prefix) return;
+
+        const command = client.commands.get(commandName);
+
+        if (command.guildOnly && message.channel.type != 'text') {
+            message.channel.send(`You can't use the command ${commandName} in a DM! For a list of commands you can use type "help"`)
+        }
 
         try {
-            client.commands.get(command).execute(message, args);
+            command.execute(message, args);
         } catch (e) {
             console.error(e);
-            message.reply(`There was an error trying to execute the command ${command} :sob:`);
+            message.reply(`There was an error trying to execute the command ${prefix}${commandName} :sob:`);
         }
     }
 });
 
 // message sent when the bot first joins the server
 client.on('guildCreate', guild => {
-    guild.systemChannel.send(`
-Hello, ${guild.name}, I'm happy to be here! :bell:\n
-My prefix is ~, to set me up type "~setup" and I'll walk you through my setup :smile:
-    `);
+    guild.systemChannel.send(`Hello, ${guild.name}, I'm happy to be here! :bell:\nMy prefix is ~, to set me up type "~setup" and I'll walk you through my setup :smile:`);
 
     handler.setValue('id', guild.id);
 });
