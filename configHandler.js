@@ -12,10 +12,7 @@ module.exports = {
      * @param {Guild} guild The object representing the guild
      */
     setValue(value, newValue, guild) {
-        if (guildTemplate[value] == null){
-            console.log(`Tried to set ${value} in config.json, but it doesn't exist`);
-            return false;
-        } else if (guild == null) {
+        if (guild == null) {
             console.log('You can\'t set value in a dm channel');
         }
 
@@ -23,9 +20,14 @@ module.exports = {
         const fs = require('fs');
         const guildID = guild.id;
 
+        var thisGuild = config.guilds.find(guild => guild.id == guildID);
+        
         // check if the guild exists in the json before attempting to set it
-        if (config.guilds.some(guild => guild.id == guildID)) {
-            config.guilds.filter(guild => guild.id == guildID)[0][value] = newValue;
+        if (thisGuild) {
+            if (!thisGuild[value]) {
+                console.log(`Added the new property ${value} to guild ${guild.name}.`)
+            }
+            thisGuild[value] = newValue;
         
         // if it doesn't exist already, then add a guild entry
         } else {
@@ -50,10 +52,7 @@ module.exports = {
      * @param {Guild} guild The guild object the message came from, null if dm
      */
     getValue(value, guild) {
-        if (guildTemplate[value] == null){
-            console.log(`Tried to read ${value} from config.json, but it doesn't exist`);
-            return null;
-        } else if (guild == null) {
+        if (guild == null) {
             if (dmSettings[value] == null) {
                 console.log(`${value} is not set as a default value for dm channels`);
                 return null;
@@ -61,14 +60,21 @@ module.exports = {
                 return dmSettings[value];
             }
         }
-
+        
         const config = require('./config.json');
         const fs = require('fs');
         const guildID = guild.id;
 
+        var thisGuild = config.guilds.find(guild => guild.id == guildID);
+
+
         // if the guild exists get the value from it
-        if (config.guilds.some(guild => guild.id == guildID)) {
-            return config.guilds.filter(guild => guild.id == guildID)[0][value];
+        if (thisGuild) {
+            if (thisGuild[value]) {
+                return thisGuild[value];
+            } else {
+                console.log(`Tried to read ${value} from ${guild.name}, but it doesn't exist as a property`);
+            }
 
         // if it doesn't exist create it and return the default value
         } else {
@@ -99,9 +105,10 @@ module.exports = {
         const fs = require('fs');
         const guildID = guild.id;
 
-        // if the guild exists get the value from it
-        if (config.guilds.some(guild => guild.id == guildID)) {
+        var thisGuild = config.guilds.find(guild => guild.id = guildID);
 
+        // if the guild exists get the value from it
+        if (thisGuild) {
             // go through each guild and remove the first one with a matching ID
             var i = 0;
             for (guild of config.guilds) {
@@ -117,7 +124,7 @@ module.exports = {
 
         // if it doesn't exist then there's nothing to do
         } else {
-            console.log(`Tried to delete a guild named ${guild.name} that doesn\'t exist yet`);
+            console.log(`Tried to delete a guild named ${guild.name} that doesn't exist yet`);
             return false;
         }
     }

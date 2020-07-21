@@ -3,6 +3,7 @@ module.exports = {
     description: 'Responds to the user that @tted the bot',
     args: false,
     guildOnly: false,
+    hideHelp: true,
 
     /**
      * Response whenever the bot is notified.

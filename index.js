@@ -53,20 +53,21 @@ client.on('message', message => {
         client.commands.get('hellothere').execute(message, args);
 
     } else {
-        if (!client.commands.has(commandName)) return;
         if (message.content.slice(0, prefix.length) != prefix) return;
 
-        const command = client.commands.get(commandName);
+        const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
+
+        if (!command) return;
 
         if (command.guildOnly && message.channel.type != 'text') {
             message.channel.send(`You can't use the command ${commandName} in a DM! For a list of commands you can use type "help"`)
-        }
-
-        try {
-            command.execute(message, args);
-        } catch (e) {
-            console.error(e);
-            message.reply(`There was an error trying to execute the command ${prefix}${commandName} :sob:`);
+        } else {
+            try {
+                command.execute(message, args);
+            } catch (e) {
+                console.error(e);
+                message.reply(`There was an error trying to execute the command ${prefix}${commandName} :sob:`);
+            }
         }
     }
 });

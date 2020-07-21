@@ -2,7 +2,8 @@ module.exports = {
     name: '🔔',
     description: 'dingdong',
     args: false,
-    guildOnly: false,
+    guildOnly: false,  
+    hideHelp: true,
 
     /**
      * A fun little command that responds with `ding dong` and bell emojis.
