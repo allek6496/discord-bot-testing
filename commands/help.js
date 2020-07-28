@@ -4,7 +4,7 @@ module.exports = {
     aliases: ['commands'],
     usage: '<command name>',
     guildOnly: false,
-    args: 'false',
+    args: false,
 
     /**
      * Replies with either the list of commands or a specific command.
@@ -47,6 +47,7 @@ module.exports = {
             if (command.aliases) data.push(`> Aliases: ${command.aliases.join(', ')}`);
             if (command.description) data.push(`> Description: ${command.description}`);
             if (command.usage) data.push(`> Usage: ${prefix}${command.name} ${command.usage}`);
+            if (!command.args) data.push(`> This command does not need arguments`)
 
             message.channel.send(data, {split: true});
         }

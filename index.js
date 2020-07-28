@@ -58,6 +58,7 @@ client.on('message', message => {
         const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
         if (!command) return;
+        console.log(`\n${commandName} to be called!`);
 
         if (command.guildOnly && message.channel.type != 'text') {
             message.channel.send(`You can't use the command ${commandName} in a DM! For a list of commands you can use type "help"`)
@@ -65,7 +66,7 @@ client.on('message', message => {
             try {
                 command.execute(message, args);
             } catch (e) {
-                console.error(e);
+                console.log(e);
                 message.reply(`There was an error trying to execute the command ${prefix}${commandName} :sob:`);
             }
         }
