@@ -23,7 +23,7 @@ module.exports = {
         try {
             const newCommand = require(`./${command.name}.js`);
             message.client.commands.set(newCommand.name, newCommand);
-            message.channel.send(`Command ${command.name} was reloaded!`);
+            if (command.name != 'setup') message.channel.send(`Command ${command.name} was reloaded!`);
         } catch (error) {
             console.log(error);
             message.channel.send(`There was an error while reloading the command \`${command.name}\`, failed to fetch. \n\`${error.message}\``);

@@ -33,7 +33,7 @@ client.on('message', message => {
 
     // there's currently no option to change prefix in a dm channel
     if (message.channel.type === 'text') {
-        var prefix = handler.getValue('prefix', message.guild.id);
+        var prefix = handler.getValue('prefix', message.guild);
     } else {
         var prefix = ''
     }
@@ -77,12 +77,12 @@ client.on('message', message => {
 client.on('guildCreate', guild => {
     guild.systemChannel.send(`Hello, ${guild.name}, I'm happy to be here! :bell:\nMy prefix is ~, to set me up type "~setup" and I'll walk you through my setup :smile:`);
 
-    handler.setValue('id', guild.id);
+    handler.setValue('id', guild);
 });
 
 // remove the guild entry when the bot leaves
 client.on('guildDelete', guild => {
-    handler.deleteGuild(guild.id);
+    handler.deleteGuild(guild);
 })
 
 // log into discord using the token

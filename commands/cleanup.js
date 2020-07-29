@@ -4,16 +4,23 @@ var toDelete = {
         'new-members',
         'announcements',
         'moderation',
+        'bot-spam',
     ], 
     roles: [
         'new',
         'exec',
         'member',
+    ],
+    configValues: [
+        'bot_spam', 
+        'moderation',
+        'new_members'
     ]
 }
 
 const reload = require('./reload.js');
 const { Permissions } = require('discord.js');
+const handler = require('../configHandler');
 
 
 module.exports = {
@@ -29,8 +36,9 @@ module.exports = {
      * @param {string Array} args The list of words following the triggering command (not used).
      */
     execute(message, args) {
-        message.guild.channels.cache.filter(channel => toDelete.channels.includes(channel.name)).map(channel => channel.delete());
-        message.guild.roles.cache.filter(role => toDelete.roles.includes(role.name)).map(role => role.delete());
+        message.guild.channels.cache.filter(channel => toDelete.channels.includes(channel.name)).map(channel => channel.delete().catch(e => console.log(e)));
+        message.guild.roles.cache.filter(role => toDelete.roles.includes(role.name)).map(role => role.delete().catch(e => console.log(e)));
+        toDelete.configValues.forEach(val => handler.setValue(val, false, message.guild));
         message.guild.roles.everyone.setPermissions(new Permissions(103926849 ))
         reload.execute(message, ['setup']);
     }

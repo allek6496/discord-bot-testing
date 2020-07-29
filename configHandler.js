@@ -1,4 +1,4 @@
-const guildTemplate = {"id": false, "prefix": '~'};
+const guildTemplate = {"id": false, "prefix": '~', "bot_spam": false, "moderation": false, "new_members": false};
 const dmSettings = {"prefix": ''};
 
 module.exports = {
@@ -59,13 +59,15 @@ module.exports = {
             } else {
                 return dmSettings[value];
             }
+        } else if (typeof guild === 'string') {
+            return console.log('ERROR: PASSED ID AS GUILD, PLEASE PASS GUILD OBJECT');
         }
         
         const config = require('./config.json');
         const fs = require('fs');
         const guildID = guild.id;
 
-        var thisGuild = config.guilds.find(guild => guild.id == guildID);
+        var thisGuild = config.guilds.find(guild => guild.id === guildID);
 
 
         // if the guild exists get the value from it
@@ -78,6 +80,8 @@ module.exports = {
 
         // if it doesn't exist create it and return the default value
         } else {
+            console.log(`Recieved request for ${value} from ${guild.name}, but ${guild.name} doesn't exist. Creating a new entry.`)
+
             // set up a new guild template with updated value
             var newGuild = guildTemplate;
             newGuild.id = guildID;
