@@ -13,7 +13,7 @@ module.exports = {
      */
     execute(message, args) {
         const handler = require('../configHandler.js');
-        const prefix = handler.getValue('prefix', message.guild);
+        const prefix = handler.getGuildValue('prefix', message.guild);
         const data = [];
         const {commands} = message.client;
         const isDM = message.channel.type != 'text';
@@ -37,7 +37,7 @@ module.exports = {
         } else {
             const name = args[0].toLowerCase();
             const command = commands.get(name) || commands.find(c => c.aliases && c.aliases.includes(name));
-            const permissions = handler.getValue("permissions", message.guild)[name];
+            const permissions = handler.getGuildValue("permissions", message.guild)[name];
             
             if (!command) {
                 return message.reply(`that's not a valid command!`);

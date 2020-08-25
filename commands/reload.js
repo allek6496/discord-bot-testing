@@ -11,7 +11,16 @@ module.exports = {
      * @param {string Array} args The list of words following the triggering command (not used).
      */
     execute(message, args) {
-        if (!args.length) return message.chanel.send('Please specify a command to reload');
+        // only allow the dev team to run this command
+        
+        //get the list of eligible devs based on their snowflakes (added by hand)
+        const handler = require('../configHandler');
+        var devs = handler.getConfigVar('devs');
+        if (!devs.includes(message.author.id)) {
+            console.log(`${message.author.username} tried to run the reload command but lacked permission.`);
+            return;
+        }
+
         const commandName = args[0].toLowerCase();
         const command = message.client.commands.get(commandName)
                         || message.client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));

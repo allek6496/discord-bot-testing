@@ -1,9 +1,82 @@
-const guildTemplate = {"id": false, "prefix": '~', "bot_spam": false, "moderation": false, "new_members": false, "permissions": {"setup": "ADMINISTRATOR", "cleanup": "ADMINISTRATOR", "prefix": "ADMINISTRATOR", "reload": "ADMINISTRATOR", "setPermissions": "ADMINISTRATOR"}};
+const guildTemplate = {"id": false, "prefix": '~', "bot_spam": false, "moderation": false, "new_members": false, "commands": {"setup": {"permissions": "ADMINISTRATOR"}, "cleanup": {"permissions": "ADMINISTRATOR"}, "prefix": {"permissions": "ADMINISTRATOR"}, "reload": {"permissions": "ADMINISTRATOR"}, "setPermissions": {"permissions": "ADMINISTRATOR"}}};
 const dmSettings = {"prefix": ''};
 
 module.exports = {
     name: 'prefixHandler',
-    description:'Tools to get and set the prefix of the bot for a certain guild',
+    description:'Tools to get and set bot information for a certain guild',
+
+    /**
+     * Sets command specific information for a specific guild
+     * @param {Guild} guild Guild object for the specific instance of the command
+     * @param {String} commandName Name of the command to set the info for
+     * @param {Object} newInfo New information to give to the command (replaces, doesn't add)
+     */
+    setCommandInfo(guild, commandName, newInfo) {
+        var commands = this.getGuildValue('commands', guild);
+
+        if (commandName in commands) {
+            commands[commandName] = newInfo;
+        } else {
+            console.log(`Adding information for ${commandName}: ${newInfo} in guild ${guild.name}`);
+            commands[commandName]
+        }
+
+        this.setGuildValue('commands', commands, guild);
+    },
+
+    /**
+     * Gets guild specific information for a command
+     * @param {Guild} guild The guild object for the specific instance of the command
+     * @param {String} commandName Name of the command to get information from
+     */
+    getCommandInfo(guild, commandName) {
+        const commands = this.getGuildValue('commands', guild);
+
+        if (commandName in commands) {
+            return commands[commandName];
+        } else {
+            console.log(`Tried to pull value for ${commandName} in ${guild.name}, but there is no information for this command here.`)
+        }
+    },
+
+    /**
+     * Gets a value from the config.json file
+     * @param {String} value Property to get the value from
+     */
+    getConfigVar(value) {
+        const config = require('./config.json');
+        const fs = require('fs');
+
+        if (value in config) return config[value];
+        else {
+            console.log(`Tried to read value ${value} from config, but it doesn't exist there.`);
+            return null;
+        }
+    },
+
+    /**
+     * Sets a value in the root config.json
+     * @param {String} value Name of property to set
+     * @param {any} newValue Value to set the property to
+     */
+    setConfigVar(value, newValue) {
+        const config = require('./config.json');
+        const fs = require('fs');
+
+        if (value in config) config[value] = newValue;
+        else {
+            console.log(`Added new paramater ${value} with value ${newValue} to the root config json.`);
+            config[value] = newValue;
+        }
+
+        fs.writeFile('./config.json', JSON.stringify(config), (e) => {
+            if (e) {
+                console.log(`Error thrown when writing ${newValue} to ${value} in config.json`);
+                throw e;
+            };
+        });
+        return true;
+    },
 
     /**
      * Sets a value within a guild
@@ -11,21 +84,20 @@ module.exports = {
      * @param {var} newValue The new value to change it to
      * @param {Guild} guild The object representing the guild
      */
-    setValue(value, newValue, guild) {
+    setGuildValue(value, newValue, guild) {
         if (guild == null) {
             console.log('You can\'t set value in a dm channel');
         }
 
-        const config = require('./config.json');
-        const fs = require('fs');
-        const guildID = guild.id;
+        var guilds = this.getConfigVar('guilds');
 
-        var thisGuild = config.guilds.find(guild => guild.id == guildID);
+        const guildID = guild.id;
+        var thisGuild = guilds.find(guild => guild.id == guildID);
         
         // check if the guild exists in the json before attempting to set it
         if (thisGuild) {
             if (!thisGuild[value]) {
-                console.log(`Added the new property ${value} to guild ${guild.name}.`)
+                    console.log(`Adding the new property ${value} to guild ${guild.name}.`)
             }
             thisGuild[value] = newValue;
         
@@ -39,9 +111,7 @@ module.exports = {
             config.guilds.push(newGuild);
         }
 
-        fs.writeFile('./config.json', JSON.stringify(config), (e) => {
-            if (e) throw err;
-        });
+        this.setConfigVar('guilds', guilds);
 
         return true;
     },
@@ -51,7 +121,7 @@ module.exports = {
      * @param {string} value A string for the property you want to get
      * @param {Guild} guild The guild object the message came from, null if dm
      */
-    getValue(value, guild) {
+    getGuildValue(value, guild) {
         if (guild == null) {
             if (dmSettings[value] == null) {
                 console.log(`${value} is not set as a default value for dm channels`);
@@ -77,7 +147,7 @@ module.exports = {
             } else {
                 console.log(`Tried to read ${value} from ${guild.name}, but it doesn't exist as a property. Setting to default and returning.`);
                 if (value in guildTemplate) {
-                    this.setValue(value, guildTemplate[value], guild);
+                    this.setGuildValue(value, guildTemplate[value], guild);
                     return guildTemplate[value];
                 } else {
                     console.log(`${value} was not a default value for guilds, returning null.`);

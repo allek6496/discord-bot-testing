@@ -33,7 +33,7 @@ client.on('message', message => {
 
     // there's currently no option to change prefix in a dm channel
     if (message.channel.type === 'text') {
-        var prefix = handler.getValue('prefix', message.guild);
+        var prefix = handler.getGuildValue('prefix', message.guild);
     } else {
         var prefix = ''
     }
@@ -59,24 +59,35 @@ client.on('message', message => {
 
         if (!command) return;
 
-        const permissions = handler.getValue('permissions', message.guild);
+        var commandInfo = handler.getCommandInfo(message.guild, commandName);
 
-        if (commandName in permissions) {
-            // this is super jank but idk how else to do it
-            if (!message.guild.member(message.author).permissionsIn(message.channel).has(permissions[commandName])) return;
+        if ('permissions' in commandInfo) {
+            if (!message.guild.member(message.author).permissionsIn(message.channel).has(commandInfo['permissions'])) return;
         }
-
+        
+        if ('channels' in commandInfo) {
+            if (!(commandInfo['channels'].contains(message.channel) || commandInfo['channels'].length)) return;
+        }
+        
         console.log(`\n${commandName} to be called!`);
-
+        
         if (command.guildOnly && message.channel.type != 'text') {
             message.channel.send(`You can't use the command ${commandName} in a DM! For a list of commands you can use type "help"`)
-        } else {
-            try {
-                command.execute(message, args);
-            } catch (e) {
-                console.log(e);
-                message.reply(`There was an error trying to execute the command ${prefix}${commandName} :sob:`);
-            }
+            return;
+        } 
+        
+        if (command.args && !args.length) {
+            message.channel.send('That command requires arguments! Here are the details for this command:');
+
+            client.commands.get('help').execute(message, [commandName])
+            return;
+        }
+
+        try {
+            command.execute(message, args);
+        } catch (e) {
+            console.log(e);
+            message.reply(`There was an error trying to execute the command ${prefix}${commandName} :sob:`);
         }
     }
 });
@@ -85,7 +96,7 @@ client.on('message', message => {
 client.on('guildCreate', guild => {
     guild.systemChannel.send(`Hello, ${guild.name}, I'm happy to be here! :bell:\nMy prefix is ~, to set me up type "~setup" and I'll walk you through my setup :smile:`);
 
-    handler.setValue('id', guild);
+    handler.setGuildValue('id', guild);
 });
 
 // remove the guild entry when the bot leaves

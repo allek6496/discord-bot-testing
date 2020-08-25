@@ -18,7 +18,7 @@ module.exports = {
         var call = commandProgress.ongoingCommands.find(call => (call.guildID === message.guild.ID && 
                                                              call.userID === message.author.ID));
         
-        const prefix = handler.getValue('prefix', message.guild);
+        const prefix = handler.getGuildValue('prefix', message.guild);
         if (call) {
             const steps = [this.step1, this.step2, this.step3, this.lastStep];
 
@@ -144,7 +144,7 @@ module.exports = {
                 )
                 .then(channel => {
                     channel.setParent(newChannels);
-                    handler.setValue('bot_spam', channel.id, message.guild);
+                    handler.setGuildValue('bot_spam', channel.id, message.guild);
                 })
                 .catch(error => {
                     console.log(error);
@@ -175,7 +175,7 @@ module.exports = {
                 )
                 .then(channel => {
                     channel.setParent(newChannels);
-                    handler.setValue('new_members', channel.id, message.guild);
+                    handler.setGuildValue('new_members', channel.id, message.guild);
                 })
                 .catch(error => {
                     console.log(error);
@@ -212,7 +212,7 @@ module.exports = {
                 )
                 .then(channel => {
                     channel.setParent(newChannels);
-                    handler.setValue('moderation', channel.id, message.guild);
+                    handler.setGuildValue('moderation', channel.id, message.guild);
                 })
                 .catch(error => {
                     console.log(error);
@@ -255,9 +255,9 @@ module.exports = {
 
     step3(message, args, prefix) {
         const guild = message.guild;
-        const new_members = handler.getValue('new_members', guild);
-        const moderation = handler.getValue('moderation', guild);
-        const bot_spam = handler.getValue('bot_spam', guild);
+        const new_members = handler.getGuildValue('new_members', guild);
+        const moderation = handler.getGuildValue('moderation', guild);
+        const bot_spam = handler.getGuildValue('bot_spam', guild);
         const reqInfo = [['new_members', new_members], ['moderation', moderation], ['bot_spam', bot_spam]];
 
         for (required of reqInfo) {
@@ -278,7 +278,7 @@ module.exports = {
                     default:
                         break;
                 }
-                handler.setValue(required[0], true, guild);
+                handler.setGuildValue(required[0], true, guild);
                 break;
             } else if (required[1] === true) {
                 if (!args) {
@@ -287,7 +287,7 @@ module.exports = {
                     var channel = message.guild.channels.fetch(args[0])
                     .then(channel => {
                         if (channel) {
-                            handler.setValue(required[0], channel.id, guild);
+                            handler.setGuildValue(required[0], channel.id, guild);
                         } else {
                             message.channel.send(`Failed to find channel named ${args[0]}, try again please. You may need to change the channel name, this is totally fine just respond with \`${prefix}setup <channel_name>\`.`);
                         }
