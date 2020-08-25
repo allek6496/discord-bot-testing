@@ -1,4 +1,4 @@
-const guildTemplate = {"id": false, "prefix": '~', "bot_spam": false, "moderation": false, "new_members": false};
+const guildTemplate = {"id": false, "prefix": '~', "bot_spam": false, "moderation": false, "new_members": false, "permissions": {"setup": "ADMINISTRATOR", "cleanup": "ADMINISTRATOR", "prefix": "ADMINISTRATOR", "reload": "ADMINISTRATOR", "setPermissions": "ADMINISTRATOR"}};
 const dmSettings = {"prefix": ''};
 
 module.exports = {

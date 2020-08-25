@@ -37,6 +37,7 @@ module.exports = {
         } else {
             const name = args[0].toLowerCase();
             const command = commands.get(name) || commands.find(c => c.aliases && c.aliases.includes(name));
+            const permissions = handler.getValue("permissions", message.guild)[name];
             
             if (!command) {
                 return message.reply(`that's not a valid command!`);
@@ -48,6 +49,7 @@ module.exports = {
             if (command.description) data.push(`> Description: ${command.description}`);
             if (command.usage) data.push(`> Usage: ${prefix}${command.name} ${command.usage}`);
             if (!command.args) data.push(`> This command does not need arguments`)
+            if (permissions) data.push(`> This command requires the following permissions to run: ${permissions}`)
 
             message.channel.send(data, {split: true});
         }
