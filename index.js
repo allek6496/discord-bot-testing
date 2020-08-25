@@ -58,6 +58,14 @@ client.on('message', message => {
         const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
         if (!command) return;
+
+        const permissions = handler.getValue('permissions', message.guild);
+
+        if (commandName in permissions) {
+            // this is super jank but idk how else to do it
+            if (!message.guild.member(message.author).permissionsIn(message.channel).has(permissions[commandName])) return;
+        }
+
         console.log(`\n${commandName} to be called!`);
 
         if (command.guildOnly && message.channel.type != 'text') {

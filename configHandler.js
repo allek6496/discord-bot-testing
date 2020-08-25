@@ -75,7 +75,14 @@ module.exports = {
             if (thisGuild[value]) {
                 return thisGuild[value];
             } else {
-                console.log(`Tried to read ${value} from ${guild.name}, but it doesn't exist as a property`);
+                console.log(`Tried to read ${value} from ${guild.name}, but it doesn't exist as a property. Setting to default and returning.`);
+                if (value in guildTemplate) {
+                    this.setValue(value, guildTemplate[value], guild);
+                    return guildTemplate[value];
+                } else {
+                    console.log(`${value} was not a default value for guilds, returning null.`);
+                    return null;
+                }
             }
 
         // if it doesn't exist create it and return the default value
