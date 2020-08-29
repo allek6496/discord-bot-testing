@@ -13,6 +13,6 @@ module.exports = {
     execute(message, args) {
         const handler = require('../configHandler.js')
 
-        message.channel.send(`Hello ${message.author}, if you're confused how to use me, try typing ${handler.getGuildValue('prefix')}help! :bell:`);
+        message.channel.send(`Hello ${message.author}, if you're confused how to use me, try typing ${handler.getGuildValue('prefix', message.guild)}help! :bell:`);
     }
 }
