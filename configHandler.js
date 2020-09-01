@@ -1,4 +1,19 @@
-const guildTemplate = {"id": false, "prefix": '~', "bot_spam": false, "moderation": false, "new_members": false, "commands": {"setup": {"permissions": "ADMINISTRATOR"}, "cleanup": {"permissions": "ADMINISTRATOR"}, "prefix": {"permissions": "ADMINISTRATOR"}, "reload": {"permissions": "ADMINISTRATOR"}, "setPermissions": {"permissions": "ADMINISTRATOR"}}};
+const guildTemplate = {
+    "id": false, 
+    "prefix": '~', 
+    "bot_spam": false, 
+    "moderation": false, 
+    "new_members": false, 
+    "commands": {
+        "setup": {"permissions": "ADMINISTRATOR"}, 
+        "cleanup": {"permissions": "ADMINISTRATOR"}, 
+        "prefix": {"permissions": "ADMINISTRATOR"}, 
+        "reload": {"permissions": "ADMINISTRATOR"}, 
+        "setPermissions": {"permissions": "ADMINISTRATOR"},
+        "setChannels": {"permissions": "ADMINISTRATOR"}
+    }
+};
+
 const dmSettings = {"prefix": ''};
 
 module.exports = {
@@ -18,7 +33,7 @@ module.exports = {
             commands[commandName] = newInfo;
         } else {
             console.log(`Adding information for ${commandName}: ${newInfo} in guild ${guild.name}`);
-            commands[commandName]
+            commands[commandName] = newInfo;
         }
 
         this.setGuildValue('commands', commands, guild);
@@ -35,7 +50,8 @@ module.exports = {
         if (commandName in commands) {
             return commands[commandName];
         } else {
-            console.log(`Tried to pull value for ${commandName} in ${guild.name}, but there is no information for this command here.`)
+            console.log(`Tried to pull value for ${commandName} in ${guild.name}, but there is no information for this command here.`);
+            
         }
     },
 
@@ -44,8 +60,7 @@ module.exports = {
      * @param {String} value Property to get the value from
      */
     getConfigVar(value) {
-        const config = require('./config.json');
-        const fs = require('fs');
+        var config = require('./config.json');
 
         if (value in config) return config[value];
         else {
@@ -60,7 +75,7 @@ module.exports = {
      * @param {any} newValue Value to set the property to
      */
     setConfigVar(value, newValue) {
-        const config = require('./config.json');
+        var config = require('./config.json');
         const fs = require('fs');
 
         if (value in config) config[value] = newValue;
@@ -85,8 +100,9 @@ module.exports = {
      * @param {Guild} guild The object representing the guild
      */
     setGuildValue(value, newValue, guild) {
-        if (guild == null) {
+        if (guild === null) {
             console.log('You can\'t set value in a dm channel');
+            return;
         }
 
         var guilds = this.getConfigVar('guilds');
@@ -108,7 +124,7 @@ module.exports = {
             newGuild.id = guildID;
             newGuild[value] = newValue;
 
-            config.guilds.push(newGuild);
+            guilds.push(newGuild);
         }
 
         this.setConfigVar('guilds', guilds);
@@ -133,11 +149,11 @@ module.exports = {
             return console.log('ERROR: PASSED ID AS GUILD, PLEASE PASS GUILD OBJECT');
         }
         
-        const config = require('./config.json');
         const fs = require('fs');
+        var guilds = this.getConfigVar('guilds');
         const guildID = guild.id;
 
-        var thisGuild = config.guilds.find(guild => guild.id === guildID);
+        var thisGuild = guilds.find(guild => guild.id === guildID);
 
 
         // if the guild exists get the value from it
@@ -163,11 +179,10 @@ module.exports = {
             var newGuild = guildTemplate;
             newGuild.id = guildID;
 
-            config.guilds.push(newGuild);
+            guilds.push(newGuild);
 
-            fs.writeFile('./config.json', JSON.stringify(config), (e) => {
-                if (e) throw err;
-            });
+            this.setConfigVar('guilds', guilds);
+            
             return newGuild[value];
         }
     },
@@ -182,19 +197,20 @@ module.exports = {
             return false;
         }
 
-        const config = require('./config.json');
+        var guilds = this.getConfigVar('guilds');
         const fs = require('fs');
         const guildID = guild.id;
 
-        var thisGuild = config.guilds.find(guild => guild.id = guildID);
+        var thisGuild = guilds.find(guild => guild.id = guildID);
 
         // if the guild exists get the value from it
         if (thisGuild) {
             // go through each guild and remove the first one with a matching ID
             var i = 0;
-            for (guild of config.guilds) {
+            for (guild of guilds) {
                 if (guild.id === guildID) {
-                    config.guilds.splice(i, 1);
+                    guilds.splice(i, 1);
+                    this.setConfigVar('guilds', guilds);
                     return true;
                 }
             } 

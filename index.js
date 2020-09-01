@@ -61,15 +61,16 @@ client.on('message', message => {
 
         var commandInfo = handler.getCommandInfo(message.guild, commandName);
 
-        if ('permissions' in commandInfo) {
-            if (!message.guild.member(message.author).permissionsIn(message.channel).has(commandInfo['permissions'])) return;
+        if (commandInfo) {
+            if ('permissions' in commandInfo) {
+                if (!message.guild.member(message.author).permissionsIn(message.channel).has(commandInfo['permissions'])) return;
+            }
+            
+            if ('channels' in commandInfo) {
+                if (!(commandInfo['channels'].contains(message.channel.id) || commandInfo['channels'].length)) return;
+            }
         }
-        
-        if ('channels' in commandInfo) {
-            if (!(commandInfo['channels'].contains(message.channel) || commandInfo['channels'].length)) return;
-        }
-        
-        console.log(`\n${commandName} to be called!`);
+
         
         if (command.guildOnly && message.channel.type != 'text') {
             message.channel.send(`You can't use the command ${commandName} in a DM! For a list of commands you can use type "help"`)
@@ -78,11 +79,13 @@ client.on('message', message => {
         
         if (command.args && !args.length) {
             message.channel.send('That command requires arguments! Here are the details for this command:');
-
+            
             client.commands.get('help').execute(message, [commandName])
             return;
         }
-
+        
+        console.log(`\n${commandName} to be called!`);
+        
         try {
             command.execute(message, args);
         } catch (e) {
@@ -94,15 +97,15 @@ client.on('message', message => {
 
 // message sent when the bot first joins the server
 client.on('guildCreate', guild => {
-    guild.systemChannel.send(`Hello, ${guild.name}, I'm happy to be here! :bell:\nMy prefix is ~, to set me up type "~setup" and I'll walk you through my setup :smile:`);
+    guild.systemChannel.send(`Hello, ${guild.name}, I'm happy to be here! :bell:\nMy prefix is ~, to set me up type \`~setup\` and I'll walk you through my setup :smile:`);
 
-    handler.setGuildValue('id', guild);
+    handler.setGuildValue('id', guild.id, guild);
 });
 
 // remove the guild entry when the bot leaves
 client.on('guildDelete', guild => {
     handler.deleteGuild(guild);
-})
+});
 
 // log into discord using the token
 client.login(process.env.TOKEN);

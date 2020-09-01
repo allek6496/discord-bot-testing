@@ -16,8 +16,8 @@ module.exports = {
         //get the list of eligible devs based on their snowflakes (added by hand)
         const handler = require('../configHandler');
         var devs = handler.getConfigVar('devs');
-        if (!devs.includes(message.author.id)) {
-            console.log(`${message.author.username} tried to run the reload command but lacked permission.`);
+        if (!devs.includes(message.author.id.toString())) {
+            console.log(`${message.author.username} tried to run the reload command but lacked permission. Their id was ${message.author.id} but this doesn't match the eligible dev ids of ${devs}`);
             return;
         }
 

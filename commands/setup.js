@@ -1,7 +1,7 @@
-// newCommand: {guildID: false, userID: false, commandName: false, step: 1},
-var commandProgress = {
-    ongoingCommands: []
-}
+// // newCommand: {guildID: false, userID: false, commandName: false, step: 1},
+// var commandProgress = {
+//     ongoingSetup: []
+// }
 
 const { Permissions } = require('discord.js');
 const handler = require('../configHandler.js');
@@ -15,7 +15,16 @@ module.exports = {
     
     execute(message, args) {
         // check if this person already has progress through the message chain
-        var call = commandProgress.ongoingCommands.find(call => (call.guildID === message.guild.ID && 
+        var commandProgress = handler.getConfigVar('commandProgress');
+        
+        if (!commandProgress){
+            handler.setConfigVar('commandProgress', {'ongoingSetup': []});
+            commandProgress = {'ongoingSetup': []};
+        } else if (!commandProgress.hasOwnProperty('ongoingSetup')) {
+            commandProgress['ongoingSetup'] = [];
+        }
+
+        var call = commandProgress.ongoingSetup.find(call => (call.guildID === message.guild.ID && 
                                                              call.userID === message.author.ID));
         
         const prefix = handler.getGuildValue('prefix', message.guild);
@@ -24,10 +33,10 @@ module.exports = {
 
             steps[call.step](message, args, prefix);
 
-            commandProgress.ongoingCommands[commandProgress.ongoingCommands.indexOf(call)].step++;
+            commandProgress.ongoingSetup[commandProgress.ongoingSetup.indexOf(call)].step++;
 
         } else {
-            commandProgress.ongoingCommands.push({
+            commandProgress.ongoingSetup.push({
                 guildID: message.guild.ID,
                 userID: message.author.ID,
                 step: 0
@@ -35,6 +44,8 @@ module.exports = {
 
             message.channel.send(`You are beginning to set up your server, please enter the same command to confirm your decision. \nYou can undo most of the changes with ${prefix}cleanup, but @everyone role permissions, as well as some other settings, will stay chaged even after running the cleanup command. Only do this if you are absolutely sure this is what you want to do (it is recomended not to run this command on a server that is already established)`);
         }
+
+        handler.setConfigVar('commandProgress', commandProgress);
     },
 
     step1(message, args, prefix) {
@@ -241,13 +252,17 @@ module.exports = {
                 break;
 
             default:
+                var commandProgress = handler.getConfigVar('commandProgress');
+
                 message.channel.send('Please respond with a number 1 or 2 representing your choice for how to set up the server!');
                 
                 // prevent the command from progressing
-                var call = commandProgress.ongoingCommands.find(call => (call.guildID === message.guild.ID && 
+                var call = commandProgress.ongoingSetup.find(call => (call.guildID === message.guild.ID && 
                                                                          call.userID === message.author.ID));
                 
-                if (call) commandProgress.ongoingCommands[commandProgress.ongoingCommands.indexOf(call)].step--;
+                if (call) commandProgress.ongoingSetup[commandProgress.ongoingSetup.indexOf(call)].step--;
+
+                handler.setConfigVar('commandProgress', commandProgress);
 
                 break;
         }
@@ -307,17 +322,39 @@ module.exports = {
             message.channel.send(`Perfect! All channels have been saved. Please continue to the next step by typing ${prefix}setup`);
         } else {
             // prevent the command from progressing
-            var call = commandProgress.ongoingCommands.find(call => (call.guildID === guild && 
+            var commandProgress = handler.getConfigVar('commandProgress');
+
+            var call = commandProgress.ongoingSetup.find(call => (call.guildID === guild && 
                 call.userID === message.author.ID));
 
-            if (call) commandProgress.ongoingCommands[commandProgress.ongoingCommands.indexOf(call)].step--;
+            if (call) commandProgress.ongoingSetup[commandProgress.ongoingSetup.indexOf(call)].step--;
+
+            handler.setConfigVar('commandProgress');
+        }
+    },
+
+    /**
+     * Removes the saved progress for a specific server
+     * @param {Message} message The triggering message
+     */
+    cleanup(message) {
+        var commandProgress = handler.getConfigVar('commandProgress');
+
+        try {
+            var thisSetup = commandProgress.ongoingSetup.find(call => (call.guildID === message.guild && 
+                                                                    call.userID === message.author.ID));
+
+            commandProgress.ongoingSetup.splice(commandProgress.ongoingSetup.indexOf(thisSetup), 1);      
+        } catch (e) {
+            console.log('Couldn\'t find an ongoing setup command');
+            console.log(e);
         }
     },
 
     lastStep(message, args, prefix) {
         message.channel.send(`Wonderful! :tada: \nYou have completed setup of your server! Go and have some fun!`);
 
-        const reload = require('./reload.js');
-        reload.execute(message, ['setup']);
-    }
+        //delete the setup progress from this person, letting them run it again (not sure why they would want to do that though)
+        this.cleanup(message);
+    },
 }

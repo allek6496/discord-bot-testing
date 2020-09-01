@@ -15,20 +15,34 @@ module.exports = {
         const handler = require('../configHandler');
         
         const command = args.shift();
+        var commandInfo = handler.getCommandInfo(message.guild, command);
+
+        if (!commandInfo) {
+            commandInfo = {'channels': []};
+        }
 
         var failedToFind = [];
 
-        args.array.forEach(channel => {
+        args.forEach(channel => {
             const channels = message.guild.channels;
     
-            var correctChannel = channels.find(element => element.name == channel);
+            var correctChannel = channels.cache.find(element => element.name == channel).id;
     
             if (correctChannel) {
-                var commandInfo = handler.getCommandInfo(message.guild, command);
-                if (!commandInfo["channels"]) commandInfo["channels"].push(correctChannel);
+                if (commandInfo && commandInfo['channels']) commandInfo['channels'].push(correctChannel);
+                else if (commandInfo) commandInfo['channels'] = [correctChannel];
+
             } else {
                 failedToFind.push(channel);
             }
         });
+
+        handler.setCommandInfo(message.guild, command, commandInfo);
+
+        if (failedToFind) {
+            failedToFind.forEach(channel => {
+                message.channel.send('Could not find a channel named ' + channel + ' !');
+            });
+        }
     }
 }

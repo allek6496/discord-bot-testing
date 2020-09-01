@@ -18,7 +18,7 @@ var toDelete = {
     ]
 }
 
-const reload = require('./reload.js');
+const setup = require('./setup.js');
 const { Permissions } = require('discord.js');
 const handler = require('../configHandler');
 
@@ -39,7 +39,7 @@ module.exports = {
         message.guild.channels.cache.filter(channel => toDelete.channels.includes(channel.name)).map(channel => channel.delete().catch(e => console.log(e)));
         message.guild.roles.cache.filter(role => toDelete.roles.includes(role.name)).map(role => role.delete().catch(e => console.log(e)));
         toDelete.configValues.forEach(val => handler.setGuildValue(val, false, message.guild));
-        message.guild.roles.everyone.setPermissions(new Permissions(103926849 ))
-        reload.execute(message, ['setup']);
+        message.guild.roles.everyone.setPermissions(new Permissions(70274625))
+        setup.cleanup(message);
     }
 }
