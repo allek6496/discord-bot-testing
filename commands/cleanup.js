@@ -1,3 +1,4 @@
+// list of items to delete during cleanup sorted by their types
 var toDelete = {
     channels: [
         'Created Channels',
@@ -14,14 +15,16 @@ var toDelete = {
     configValues: [
         'bot_spam', 
         'moderation',
-        'new_members'
+        'new_members',
+        'new',
+        'exec',
+        'member'
     ]
 }
 
 const setup = require('./setup.js');
 const { Permissions } = require('discord.js');
 const handler = require('../configHandler');
-
 
 module.exports = {
     name: 'cleanup',
@@ -31,15 +34,51 @@ module.exports = {
     hideHelp: false,
 
     /**
-     * For admin use, removes the effects of setup for easier testing and to revert the server to a previous state more easily.
+     * Mainly for admin use, removes the effects of setup for easier testing and to revert the server to a previous state more easily. 
+     * Also used if the bot is not desired anymore on the server, but they want to keep their server
      * @param {Message} message Discord message obect representing the triggering message.
      * @param {string Array} args The list of words following the triggering command (not used).
      */
     execute(message, args) {
-        message.guild.channels.cache.filter(channel => toDelete.channels.includes(channel.name)).map(channel => channel.delete().catch(e => console.log(e)));
-        message.guild.roles.cache.filter(role => toDelete.roles.includes(role.name)).map(role => role.delete().catch(e => console.log(e)));
+        // keep track of the deleted channels
+        var deletedIDs = [];
+
+        // go through each channel and if it should be deleted, delete it
+        message.guild.channels.cache.forEach(channel =>
+            toDelete.channels.includes(channel.name)).map(channel => {
+                deletedIDs.push(channel.id);
+                channel.delete().catch(e => console.log(e));
+            }
+        );
+        
+        // same for roles, if the role matches the name of one of the roles in the delete list, delete it
+        message.guild.roles.cache.forEach(role => 
+            toDelete.roles.includes(role.name)).map(role => 
+                role.delete().catch(e => console.log(e)
+            )
+        );
+        
+        // reset the guild values to false
         toDelete.configValues.forEach(val => handler.setGuildValue(val, false, message.guild));
+        
+        // some decent everyone permissions, I forget what they are
         message.guild.roles.everyone.setPermissions(new Permissions(70274625))
+        
+        // resets the setup function progress in this server
         setup.cleanup(message);
+
+        // go through each of the commands, and if it used to reference a deleted guild, erase that reference
+        var commands = handler.getGuildValue('commands', message.guild);
+        for (var command in commands) {
+            if (!command.hasOwnProperty('channels')) continue;
+
+            command['channels'].filter(channel => {
+                !deletedIDs.includes(channel)
+            });
+        }
+        handler.setGuildValue('commands', commands, message.guild);
+
+        
+        message.channel.send('Your server has been cleaned up!');
     }
 }

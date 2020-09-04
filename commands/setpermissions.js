@@ -1,4 +1,6 @@
 const handler = require("../configHandler.js");
+
+// list of valid permissions, straight from the discord website except for the "NONE" entry that removes restrictions
 const validPermissions = [
     ['ADMINISTRATOR', '(implicitly has all permissions, and bypasses all channel overwrites)'],
     ['CREATE_INSTANT_INVITE', '(create invitations to the guild)'],
@@ -36,7 +38,7 @@ const validPermissions = [
 
 module.exports = {
     name: 'setpermissions',
-    description: 'Gives a specific command a required permission to be run. This is a very important command for security reasons.',
+    description: `Gives a specific command a required permission to be run. This is a very important command for security reasons. To see the list of options, enter options instead of a command name. To remove restrictions, enter none instead of a command name. To see the current restrictions on a command, only include the command and no permissions to set it to (you can also use the help command).`,
     args: true,
     guildOnly: true,
     usage: '<command name> <permission required>',
@@ -44,47 +46,81 @@ module.exports = {
     aliases: ['permissions'],
 
     execute(message, args) {
-        var permissions = handler.getGuildValue('permissions', message.guild);
+        // give them the list of permissions in a nice to see format. Takes kinda long to send though :/
+        if (args[0] === 'options') {
+            message.channel.send('Here is a list of valid permissions: ');
+
+            var output = [];
+
+            // just some stuff to make the output look nice while saving work while I was parsing it earlier
+            for (var p = 0; p < validPermissions.length; p++) {
+                var thisPermission = validPermissions[p];
+                if (thisPermission.length === 1) output.push(`\`${thisPermission[0]}\``);
+                else output.push(`\`${thisPermission[0]} ${thisPermission[1]}\``);
+            }
+
+            message.channel.send(output.join('\n'));
+            return;
+        }
+
         const prefix = handler.getGuildValue('prefix', message.guild);
         const commandName = args[0];
+        var commandInfo = handler.getGuildValue('commands')[commandName];
 
-        if (args.length == 1) {
-            if (commandName in permissions) message.channel.send(`The command \`${commandName}\` requires the user to have \`${permissions[commandName]}\` permissions.
-                                                               \n To change this, type \`${prefix}setpermissions ${commandName} <new permission>\``);
-            else message.channel.send(`This command does not currently have any required permissions, this means anyone in the server can use it. To change this, type \`${prefix}setpermissions ${commandName} <new permission>\``);
-        } else if (args.length >= 2) {
-            const permission = args[1].toUpperCase();
+        // if there's just one argument, and there's no current permissions, tell them that because one argument means just to tell the current permissions (kinda unintuitive)
+        if (args.length === 1 && !commandInfo.hasOwnProperty('permissions')) {
+            message.channel.send(`This command does not currently have any required permissions, this means anyone in the server can use it. To change this, type \`${prefix}setpermissions ${commandName} <new permission>\` or \`${prefix}setpermissions options\` to view the possible choices for required permissions.`);
+        }
+ 
+        // if they just want to know the permissions and they exist tell them
+        else if (args.length === 1) {
+            var permissions = commandInfo['permissions'];
+            message.channel.send(`The command \`${commandName}\` requires the user to have \`${permissions[commandName]}\` permissions.
+                                  \n To change this, type \`${prefix}setpermissions ${commandName} <new permission>\` or \`${prefix}setpermissions options\` to view the possible choices for required permissions.`);
+        } 
+        
+        // set the permissions for this command as per their request
+        else if (args.length >= 2) {
+            // all permissions are in upper case so fix it in case they didn't do it that way
+            const newPermission = args[1].toUpperCase();
             
-            console.log(permission);
+            console.log(`Setting ${commandName} to require ${newPermission} in ${message.guild.name}`);
 
+            // check if it's a valid permission in the list
             var isValid = false;
-
             for (var p = 0; p < validPermissions.length; p++) {
-                if (validPermissions[p][0] == permission) { 
+                if (validPermissions[p][0] == newPermission) { 
                     isValid = true;
                     break;
                 }
             }
 
-            if (isValid) {
-                var oldPermission = permissions[commandName];
-                permissions[commandName] = permission;
-
-                if (commandName in permissions) {
-                    handler.setGuildValue('permissions', permissions, message.guild);
-                    message.channel.send(`You have successfully changed the permissions of ${commandName} from ${oldPermission} to ${permission}`);
-                } else {
-                    handler.setGuildValue('permissions', permissions, message.guild);
-                    message.channel.send(`You have successfully added the required permission ${permission} to ${commandName}. It was usable by anyone previously`);
-                }
-            } else if (permission == "NONE") {
-                delete permissions[commandName];
+            // if they wanted none, remove everything
+            if (newPermission.toLower() == 'none') {
+                delete commandInfo['permissions'];
+                handler.setCommandInfo(message.guild, commandName, commandInfo);
                 message.channel.send(`You have successfully removed permission requirements for ${commandName}, anybody in this server can use the command now.`);
+            
+            // if it's a valid permission in the list
+            } else if (isValid) {
+                // the only difference here is the response, but I wanted the response to be after the setting in case there's an eror
+                if (commandInfo.hasOwnProperty('permissions')) {
+                    commandInfo.permissions = newPermissions;
+                    handler.setCommandInfo(message.guild, commandName, commandInfo);
+                    message.channel.send(`You have successfully changed the permissions of ${commandName} from ${oldPermission} to ${newPermission}`);
+                } else {
+                    commandInfo['permissions'] = newPermissions;
+                    handler.setCommandInfo(message.guild, commandName, commandInfo);
+                    message.channel.send(`You have successfully added the required permission ${newPermission} to ${commandName}. It was usable by anyone previously`);
+                }
+            
+            // if it's not a valid permission, prompt them with the list of valid permissions
             } else {
                 message.channel.send('That is not a valid permission, here is the list of valid permissions: ');
 
                 var output = [];
 
+                // same thing as above
                 for (var p = 0; p < validPermissions.length; p++) {
                     var thisPermission = validPermissions[p];
                     if (thisPermission.length === 1) output.push(`\`${thisPermission[0]}\``);

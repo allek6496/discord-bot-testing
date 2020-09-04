@@ -1,0 +1,1 @@
+// command that when run activates the bot in a server, allowing it to be used.

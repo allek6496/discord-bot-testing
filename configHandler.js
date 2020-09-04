@@ -4,14 +4,19 @@ const guildTemplate = {
     "bot_spam": false, 
     "moderation": false, 
     "new_members": false, 
+    "new": false,
+    "exec": false,
+    "member": false,
     "commands": {
         "setup": {"permissions": "ADMINISTRATOR"}, 
         "cleanup": {"permissions": "ADMINISTRATOR"}, 
         "prefix": {"permissions": "ADMINISTRATOR"}, 
         "reload": {"permissions": "ADMINISTRATOR"}, 
-        "setPermissions": {"permissions": "ADMINISTRATOR"},
-        "setChannels": {"permissions": "ADMINISTRATOR"}
-    }
+        "setpermissions": {"permissions": "ADMINISTRATOR"},
+        "setchannels": {"permissions": "ADMINISTRATOR"}
+    },
+    "on_open": {},
+    "on_start": {}
 };
 
 const dmSettings = {"prefix": ''};
@@ -31,12 +36,10 @@ module.exports = {
 
         if (commandName in commands) {
             commands[commandName] = newInfo;
+            this.setGuildValue('commands', commands, guild);
         } else {
-            console.log(`Adding information for ${commandName}: ${newInfo} in guild ${guild.name}`);
-            commands[commandName] = newInfo;
+            console.log(`Tried to set ${commandName} to ${newInfo} in ${guild.name}, but it doesn't exist as a valid command!`);
         }
-
-        this.setGuildValue('commands', commands, guild);
     },
 
     /**
@@ -51,7 +54,7 @@ module.exports = {
             return commands[commandName];
         } else {
             console.log(`Tried to pull value for ${commandName} in ${guild.name}, but there is no information for this command here.`);
-            
+            return null;
         }
     },
 
@@ -101,7 +104,6 @@ module.exports = {
      */
     setGuildValue(value, newValue, guild) {
         if (guild === null) {
-            console.log('You can\'t set value in a dm channel');
             return;
         }
 
@@ -121,6 +123,7 @@ module.exports = {
         } else {
             // set up a new guild template with updated value
             var newGuild = guildTemplate;
+            
             newGuild.id = guildID;
             newGuild[value] = newValue;
 
@@ -166,7 +169,7 @@ module.exports = {
                     this.setGuildValue(value, guildTemplate[value], guild);
                     return guildTemplate[value];
                 } else {
-                    console.log(`${value} was not a default value for guilds, returning null.`);
+                    console.log(`${value} was requested from ${guild.name}, but it's not a default value for guilds, returning null.`);
                     return null;
                 }
             }
@@ -216,7 +219,7 @@ module.exports = {
             } 
 
             // if we get here then something went wrong
-            console.log('Failed to remove guild!')
+            console.log(`Failed to remove guild named ${guild.name}!`)
             return false;
 
         // if it doesn't exist then there's nothing to do
@@ -224,5 +227,19 @@ module.exports = {
             console.log(`Tried to delete a guild named ${guild.name} that doesn't exist yet`);
             return false;
         }
+    },
+
+    /**
+     * Adds empty values for all commands, so that they can be restricted to certian permissions or channels in the future.
+     * @param {Discord Client} client The discord client running this command
+     */
+    updateCommands(client) {
+        // go through each command and check if it's already in the guild template
+        client.commands.forEach(command => {
+            if (!guildTemplate.commands.hasOwnProperty(command.name)) {
+                // if it's not already in the template, add it
+                guildTemplate[command.name] = {};
+            }
+        });
     }
 }
