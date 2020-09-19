@@ -72,7 +72,7 @@ client.on('message', message => {
         if (commandInfo) {
             // if they don't have the correct permissions, don't let them run the command
             if (commandInfo.hasOwnProperty('permissions')) {
-                if (!message.guild.member(message.author).permissionsIn(message.channel).has(commandInfo['permissions'])) return;
+                if (!message.member.permissionsIn(message.channel).has(commandInfo['permissions'])) return;
             }
             
             // if the channel isn't allowed for thie command, don't run the command

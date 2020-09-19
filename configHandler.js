@@ -236,9 +236,9 @@ module.exports = {
     updateCommands(client) {
         // go through each command and check if it's already in the guild template
         client.commands.forEach(command => {
+            // if it's not already in the template, add it
             if (!guildTemplate.commands.hasOwnProperty(command.name)) {
-                // if it's not already in the template, add it
-                guildTemplate[command.name] = {};
+                guildTemplate["commands"][command.name] = {};
             }
         });
     }

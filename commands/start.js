@@ -4,7 +4,7 @@ module.exports = {
     name: 'start',
     description: 'Begins a club session in a voice chat. Used for attendence.',
     args: true,
-    usage: '<voice-channel> <other-voice-channel> ...',
+    usage: '<voice channel> <other voice channel> ...',
     guildOnly: true,
     hideHelp: false,
 
@@ -19,16 +19,11 @@ module.exports = {
             var channel = args.shift();
 
             // attempt to find a channel matching the name given as the first item in args
-            var correctChannel = message.guild.channels.cache.find(possible => possible.name === channel);
-
+            var correctChannel = message.guild.channels.cache.find(possible => possible.name.toLowerCase() === channel && possible.type === 'voice');
+                
             // if it doesn't exist, let them know
             if (!correctChannel) {
-                message.channel.send(`Could not find a channel named ${channel}`);
-
-            // if it does exist, but is the wrong channel type, let them know
-            } else if (correctChannel.type != 'voice') {
-                message.channel.send(`${correctChannel} is not a voice channel. Please specify a voice channel to start the meeting in (this funciton does not support text channels, as there is no way to verify attendance).`);
-            
+                message.channel.send(`Could not find a voice channel named ${channel}`);
             } else {
                 // get a list of all users currently in this vc
                 var members = correctChannel.members;
@@ -47,8 +42,10 @@ module.exports = {
 
                 // everyone "joins" at the same time
                 members.forEach(member => {
-                    onStart[channelID][member.id] = date;
+                    onStart[channelID][member.id] = [date];
                 });
+
+                handler.setGuildValue('on_start', onStart, message.guild);
             }
         }
     },
@@ -76,5 +73,16 @@ module.exports = {
 
         // push the updated logs back to config
         handler.setGuildValue('on_start', onStart, user.guild);
+    },
+
+    clear(channel) {
+        var onStart = handler.getGuildValue('on_start', channel.guild);
+
+        if (onStart.hasOwnProperty(channel.id)) {
+            delete onStart[channel.id];
+            handler.setGuildValue('on_start', onStart, channel.guild);
+        } else {
+            console.log(`Failed to clear data ${channel.name} from ${channel.guild.name}`);
+        }
     }
 }
