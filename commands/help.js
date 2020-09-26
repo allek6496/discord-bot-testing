@@ -59,7 +59,7 @@ module.exports = {
                 } else {
                     return false;
                 }
-            }).join(', '));
+            }).filter(e => e).join(', '));
 
             // prompt a follow up message from them
             data.push(`\nYou can send \`${prefix}help <command name>\` to get info on a specific command.`)
