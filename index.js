@@ -2,7 +2,7 @@ const disc = require('discord.js');
 const fs = require('fs');
 const config = require('./config.json');
 const handler = require('./configHandler.js');
-const {update} = require('./commands/start.js');
+const {update} = require('./commands/command_archive/start.js');
 
 const client = new disc.Client();
 client.commands = new disc.Collection();

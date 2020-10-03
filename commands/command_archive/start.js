@@ -1,4 +1,4 @@
-const handler = require('../configHandler.js');
+const handler = require('../../configHandler.js');
 
 module.exports = {
     name: 'start',
