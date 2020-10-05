@@ -4,6 +4,7 @@ const guildTemplate = {
     "bot_spam": false, 
     "moderation": false, 
     "new_members": false, 
+    "announcements": false,
     "new": false,
     "exec": false,
     "member": false,
@@ -14,6 +15,9 @@ const guildTemplate = {
         "reload": {"permissions": "ADMINISTRATOR"}, 
         "setpermissions": {"permissions": "ADMINISTRATOR"},
         "setchannels": {"permissions": "ADMINISTRATOR"}
+    },
+    "meetings": {
+
     },
     "on_open": {},
     "on_start": {}

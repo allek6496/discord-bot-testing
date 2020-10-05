@@ -16,6 +16,7 @@ var toDelete = {
         'bot_spam', 
         'moderation',
         'new_members',
+        'announcements',
         'new',
         'exec',
         'member'
@@ -44,19 +45,34 @@ module.exports = {
         var deletedIDs = [];
 
         // go through each channel and if it should be deleted, delete it
-        message.guild.channels.cache.forEach(channel =>
-            toDelete.channels.includes(channel.name)).map(channel => {
-                deletedIDs.push(channel.id);
-                channel.delete().catch(e => console.log(e));
-            }
-        );
+        // message.guild.channels.cache.forEach(channel =>
+        //     toDelete.channels.includes(channel.name).map(channel => {
+        //         deletedIDs.push(channel.id);
+        //         channel.delete().catch(e => console.log(e));
+        //     })
+        // ).catch(e => {
+        //     console.log(`Error deleting channels in ${message.guild.name}`);
+        // });
         
+        message.guild.channels.cache.forEach(channel => {
+            if (toDelete.channels.includes(channel.name)) {
+                deletedIDs.push(channel.id);
+                channel.delete().catch(e => console.log(`Failed to delete ${channel.name}\n${e}`));
+            }
+        });
         // same for roles, if the role matches the name of one of the roles in the delete list, delete it
-        message.guild.roles.cache.forEach(role => 
-            toDelete.roles.includes(role.name)).map(role => 
-                role.delete().catch(e => console.log(e)
-            )
-        );
+        // message.guild.roles.cache.forEach(role => 
+        //     toDelete.roles.includes(role.name)
+        // ).map(role => role.delete().catch(e => console.log(e))
+        // ).catch(e => {
+        //     console.log(`Error deleting roles in ${message.guild.name}`);
+        // });
+        message.guild.roles.cache.forEach(role => {
+            if (toDelete.roles.includes(role.name)){
+                deletedIDs.push(role.id);
+                role.delete().catch(e => console.log(`Failed to delete ${role.name}\n${e}`));
+            }
+        });
         
         // reset the guild values to false
         toDelete.configValues.forEach(val => handler.setGuildValue(val, false, message.guild));
@@ -67,7 +83,7 @@ module.exports = {
         // resets the setup function progress in this server
         setup.cleanup(message);
 
-        // go through each of the commands, and if it used to reference a deleted guild, erase that reference
+        // go through each of the commands, and if it used to reference a deleted object, erase that reference
         var commands = handler.getGuildValue('commands', message.guild);
         for (var command in commands) {
             if (!command.hasOwnProperty('channels')) continue;

@@ -158,14 +158,14 @@ module.exports = {
                     {
                         type: 'category'
                     }
-                    )
-                    .then(channel => {
-                        newChannels = channel;
-                    })
-                    .catch(error => {
-                        console.log(error);
-                        message.channel.send(`An error occurred!\n\`${error.message}`);
-                    });
+                )
+                .then(channel => {
+                    newChannels = channel;
+                })
+                .catch(error => {
+                    console.log(error);
+                    message.channel.send(`An error occurred!\n\`${error.message}`);
+                });
 
                 // ------------------------- create a channel for bot commands
                 message.guild.channels.create(
@@ -229,6 +229,7 @@ module.exports = {
                 )
                 .then(channel => {
                     channel.setParent(newChannels);
+                    handler.setGuildValue('announcements', channel.id, message.guild);
                 })
                 .catch(error => {
                     console.log(error);
@@ -297,6 +298,7 @@ module.exports = {
 
         /// channels
         const new_members = handler.getGuildValue('new_members', guild);
+        const announcements = handler.getGuildValue('announcements', guild);
         const moderation = handler.getGuildValue('moderation', guild);
         const bot_spam = handler.getGuildValue('bot_spam', guild);
 
@@ -312,6 +314,7 @@ module.exports = {
             ['bot_spam', bot_spam, 'the channel you would like to use for general bot commands'],
             ['new', newPermission, 'the role you would like to use for new, un-verified users'],
             ['members', members, 'the role you would like to use for verified club members'],
+            ['announcements', announcements, 'the channel you would like to use for server announcements and attendance notifications'],
             ['exec', exec, 'the role you would like to use for club execs/administrators']
         ];
 
@@ -396,6 +399,6 @@ module.exports = {
         message.channel.send(`Wonderful! :tada: \nYou have completed setup of your server! Go and have some fun!`);
 
         //delete the setup progress from this person, letting them run it again (not sure why they would want to do that though)
-        this.cleanup(message);
+        cleanup(message);
     }
 }

@@ -4,7 +4,7 @@ const config = require('./config.json');
 const handler = require('./configHandler.js');
 const {update} = require('./commands/command_archive/start.js');
 
-const client = new disc.Client();
+const client = new disc.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
 client.commands = new disc.Collection();
 
 // output a log when the bot is set up
@@ -109,8 +109,6 @@ client.on('message', message => {
     }
 });
 
-client.on
-
 // message sent when the bot first joins the server
 client.on('guildCreate', guild => {
     // send a message when entering the server
@@ -168,6 +166,61 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     if (newState.channel) {
         update(newState.member, newState.channel);
         // newState.guild.systemChannel.send(`${newState.member} just joined ${newState.channel.name}`);
+    }
+});
+
+client.on('messageReactionAdd', async (messageReaction, user) => {
+    if (!messageReaction.partial) {
+        await messageReaction.fetch()
+        .catch(e => console.log(e));
+    }
+
+    if (messageReaction.emoji.name === '✅') {
+        var meetings = handler.getGuildValue('meetings', messageReaction.message.guild);
+
+        // go through each of the server's meetings
+        for (var meeting in meetings) {
+            if (meetings.hasOwnProperty(meeting)) {
+                if (meetings[meeting].active) {
+                    // if the meeting coresponds to the active message
+                    if (meeting == messageReaction.message.id) {
+                        console.log("reacted to the correct message!");
+                        var users = meetings[meeting]['users'];
+                        var guildUser = messageReaction.message.guild.member(user).id;
+
+                        // if the guildUser was in a vc when attendance opened
+                        if (users.hasOwnProperty(guildUser)) {
+                            // if they've already been logged ignore
+                            if (users[guildUser]) continue;
+                            else {
+                                // --------------------------------------------------------------------------- log them as attended
+                                users[guildUser] = true;
+                                if (user.dmChannel) {
+                                    user.dmChannel.send('You\'ve successfully logged attendance!');
+                                } else {
+                                    user.createDM()
+                                    .then(dm => {
+                                        dm.send('You\'ve successfully logged attendance!');
+                                    })
+                                    .catch(e => console.log(`Failed to create dm channel with ${user.username}`));
+                                }
+                                handler.setGuildValue('meetings', meetings, messageReaction.message.guild); 
+                            }
+                        } else {
+                            if (user.dmChannel) {
+                                user.dmChannel.send('You were not in the meeting when attendance opened, and so can\'t log attendance. If you believe this is a mistake please contact an exec of the club :hugging:');
+                            } else {
+                                user.createDM()
+                                .then(dm => {
+                                    dm.send('You were not in the meeting when attendance opened, and so can\'t log attendance. If you believe this is a mistake please contact an exec of the club :hugging:');
+                                })
+                                .catch(e => console.log(`Failed to create dm channel with ${user.username}`));
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 });
 
