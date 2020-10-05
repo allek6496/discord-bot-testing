@@ -5,8 +5,8 @@ module.exports = {
     aliases: ['start', 'attendance'],
     description: 'Opens attendance for users in all voice channels',
     args: false,
-    guildOnly: false,  
-    hideHelp: true,
+    guildOnly: true,  
+    hideHelp: false,
 
     /**
      * Posts a message in the announcements channel and watches for reactions to it.
