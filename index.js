@@ -52,7 +52,7 @@ client.on('message', message => {
         client.commands.get('🔔').execute(message, args);
         
     // checks if the bot was @tted
-    } else if (message.mentions.has(client.user)) {
+    } else if (message.mentions.has(client.user) && !message.mentions.has(message.guild.roles.everyone)) { 
         client.commands.get('hellothere').execute(message, args);
 
     // if there's no special case, continue as normal
