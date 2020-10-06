@@ -65,7 +65,7 @@ module.exports = {
 
         const prefix = handler.getGuildValue('prefix', message.guild);
         const commandName = args[0];
-        var commandInfo = handler.getGuildValue('commands')[commandName];
+        var commandInfo = handler.getGuildValue('commands', message.guild)[commandName];
 
         // if there's just one argument, and there's no current permissions, tell them that because one argument means just to tell the current permissions (kinda unintuitive)
         if (args.length === 1 && !commandInfo.hasOwnProperty('permissions')) {
@@ -96,7 +96,7 @@ module.exports = {
             }
 
             // if they wanted none, remove everything
-            if (newPermission.toLower() == 'none') {
+            if (newPermission.toLowerCase() == 'none') {
                 delete commandInfo['permissions'];
                 handler.setCommandInfo(message.guild, commandName, commandInfo);
                 message.channel.send(`You have successfully removed permission requirements for ${commandName}, anybody in this server can use the command now.`);
@@ -105,11 +105,11 @@ module.exports = {
             } else if (isValid) {
                 // the only difference here is the response, but I wanted the response to be after the setting in case there's an eror
                 if (commandInfo.hasOwnProperty('permissions')) {
-                    commandInfo.permissions = newPermissions;
+                    commandInfo.permissions = newPermission;
                     handler.setCommandInfo(message.guild, commandName, commandInfo);
                     message.channel.send(`You have successfully changed the permissions of ${commandName} from ${oldPermission} to ${newPermission}`);
                 } else {
-                    commandInfo['permissions'] = newPermissions;
+                    commandInfo['permissions'] = newPermission;
                     handler.setCommandInfo(message.guild, commandName, commandInfo);
                     message.channel.send(`You have successfully added the required permission ${newPermission} to ${commandName}. It was usable by anyone previously`);
                 }

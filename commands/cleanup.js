@@ -43,16 +43,6 @@ module.exports = {
     execute(message, args) {
         // keep track of the deleted channels
         var deletedIDs = [];
-
-        // go through each channel and if it should be deleted, delete it
-        // message.guild.channels.cache.forEach(channel =>
-        //     toDelete.channels.includes(channel.name).map(channel => {
-        //         deletedIDs.push(channel.id);
-        //         channel.delete().catch(e => console.log(e));
-        //     })
-        // ).catch(e => {
-        //     console.log(`Error deleting channels in ${message.guild.name}`);
-        // });
         
         message.guild.channels.cache.forEach(channel => {
             if (toDelete.channels.includes(channel.name)) {
@@ -60,13 +50,8 @@ module.exports = {
                 channel.delete().catch(e => console.log(`Failed to delete ${channel.name}\n${e}`));
             }
         });
+        
         // same for roles, if the role matches the name of one of the roles in the delete list, delete it
-        // message.guild.roles.cache.forEach(role => 
-        //     toDelete.roles.includes(role.name)
-        // ).map(role => role.delete().catch(e => console.log(e))
-        // ).catch(e => {
-        //     console.log(`Error deleting roles in ${message.guild.name}`);
-        // });
         message.guild.roles.cache.forEach(role => {
             if (toDelete.roles.includes(role.name)){
                 deletedIDs.push(role.id);
