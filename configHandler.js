@@ -16,7 +16,8 @@ const guildTemplate = {
         "setpermissions": {"permissions": "ADMINISTRATOR"},
         "setchannels": {"permissions": "ADMINISTRATOR"},
         "open": {"permissions": "ADMINISTRATOR"},
-        "start": {"permissions": "ADMINISTRATOR"}
+        "start": {"permissions": "ADMINISTRATOR"},
+        "setvalue": {"permissions": "ADMINISTRATOR"}
     },
     "meetings": {
 

@@ -19,13 +19,15 @@ module.exports = {
         
         // try to pick up the progress
         var call = commandProgress.ongoingSetup.find(call => (call.guildID === message.guild.ID && 
-                                                             call.userID === message.author.ID));
+                                                              call.userID === message.author.ID));
         
         const prefix = handler.getGuildValue('prefix', message.guild);
 
         // if we could pick up, call the next step
         if (call) {
             const steps = [this.step1, this.step2, this.step3, this.lastStep];
+
+            if (steps[call.setp] >= steps.length) call.step = steps.length-1;
 
             steps[call.step](message, args, prefix);
 
@@ -278,8 +280,6 @@ module.exports = {
                 if (call) commandProgress.ongoingSetup[commandProgress.ongoingSetup.indexOf(call)].step--;
 
                 handler.setConfigVar('commandProgress', commandProgress);
-
-                break;
         }
     },
 
@@ -309,62 +309,74 @@ module.exports = {
             ['exec', exec, 'the role you would like to use for club execs/administrators']
         ];
 
+        var skip = false;
         // go through each, but if it's been done just skip it. this results in the first needed piece of information being requested each time
-        for (required of reqInfo) {
-            // ask for the information
-            if (!required[1]) {
-                message.channel.send(`Please send the name of ${required[2]} by using the command \`${prefix}setup <name>\`.  \:)`);
-                required[1] = true;
-                break;
+        reqInfo.forEach(required => {
+            if (!skip) {
+                // ask for the information
+                if (required[1] === false) {
+                    message.channel.send(`Please send the name of ${required[2]} by using the command \`${prefix}setup <name>\`.  \:)`);
+                    handler.setGuildValue(required[0], true, guild);
+                    skip = true;
 
-            // if the first option is set to true (asked for)
-            } else if (required[1] === true) {
-                // if they didn't give any arguments, ask for the arguments
-                if (!args) {
-                    message.channel.send(`Please respond with the name of a channel on this server in the form \`${prefix}setup <channel-name>`);
-                
-                // if they did give arguments, try and set them
-                } else {
-                    var found = false;
-                    // lol, I wrote this another way everywhere else, I forgot I could do it this way
-                    var channel = message.guild.channels.fetch(args[0])
+                // if the first option is set to true (asked for)
+                } else if (required[1] === true) {
+                    // if they didn't give any arguments, ask for the arguments
+                    if (!args) {
+                        message.channel.send(`Please send the name of ${required[2]} by using the command \`${prefix}setup <name>\`.  \:)`);
+                    
+                    // if they did give arguments, try and set them
+                    } else {
+                        var found = false;
 
-                    // after the channel is recieved, if successful, set the guild value to the channel id, otherwise ask to try again
-                    .then(channel => {
-                        if (channel) {
-                            handler.setGuildValue(required[0], channel.id, guild);
-                            found = true;
-                        } 
-                    })
-                    .error(e => {
-                        console.log(e);
-                        message.channel.send('An error occured while trying to fetch that channel, please try again.');
-                    });
+                        try {
+                            var channel = message.guild.channels.resolve(args[0].substring(2, args[0].length-1))
 
-                    var role = message.guild.roles.fetch(args[0])
-
-                    .then(role => {
-                        if (role) {
-                            handler.setGuildValue(required[0], role.id, guild);
-                            found = true;
+                            // after the channel is recieved, if successful, set the guild value to the channel id, otherwise ask to try again
+                            .then(channel => {
+                                if (channel) {
+                                    console.log("found channel");
+                                    handler.setGuildValue(required[0], channel.id, guild);
+                                    found = true;
+                                } 
+                            })
+                            .error(e => {
+                                console.log(e);
+                                message.channel.send('An error occured while trying to fetch that channel, please try again.');
+                            });
+                        } catch (e) {
+                            console.log(`Failed to find channel with id ${args[0].substring(2, args[0].length-1)}`)
                         }
-                    })
-                    .error(e => {
-                        console.log(e);
-                        message.channel.send('An error occured while trying to fetch that channel, please try again.')
-                    })
 
-                    if (!found) {
-                        message.channel.send(`Failed to find channel/role named ${args[0]}, try again please. You may need to change the channel/role name or create a new channel/role, this is totally fine just respond with \`${prefix}setup <name>\`.`);
+                        try {
+                            var role = message.guild.roles.resolve(args[0].substring(2, args[0].length-1))
+
+                            .then(role => {
+                                if (role) {
+                                    handler.setGuildValue(required[0], role.id, guild);
+                                    found = true;
+                                }
+                            })
+                            .error(e => {
+                                console.log(e);
+                                message.channel.send('An error occured while trying to fetch that channel, please try again.')
+                            })
+                        } catch (e) {
+                            console.log(`Failed to find role with id ${args[0].substring(2, args[0].length-1)}`)
+                        }
+
+                        if (!found) {
+                            message.channel.send(`Failed to find channel/role named ${args[0]}, try again please. You may need to change the channel/role name or create a new channel/role, this is totally fine just respond with \`${prefix}setup <name>\`.`);
+                        }
                     }
-                }
-                break;
+                    skip = true;
 
-            // if it's been done
-            } else if (typeof required[1] === 'string') {
-                continue;
+                // if it's been done
+                } else if (typeof required[1] === 'string') {
+
+                }
             }
-        }
+        });
 
         // if they've done everything, let them know they're done
         if (!reqInfo.filter(channel => (typeof channel[1]) !== 'string').length) {
@@ -372,12 +384,12 @@ module.exports = {
         
         // if there are still more things to do stop them from progressing
         } else {
-            // prevent the command from progressing (this block of code is used a lot but idrc about that)
             var commandProgress = handler.getConfigVar('commandProgress');
-
-            var call = commandProgress.ongoingSetup.find(call => (call.guildID === guild && 
-                call.userID === message.author.ID));
-
+            
+            // prevent the command from progressing
+            var call = commandProgress.ongoingSetup.find(call => (call.guildID === message.guild.ID && 
+                                                                        call.userID === message.author.ID));
+            
             if (call) commandProgress.ongoingSetup[commandProgress.ongoingSetup.indexOf(call)].step--;
 
             handler.setConfigVar('commandProgress', commandProgress);

@@ -112,7 +112,7 @@ client.on('message', message => {
 // message sent when the bot first joins the server
 client.on('guildCreate', guild => {
     // send a message when entering the server
-    guild.systemChannel.send(`Hello, ${guild.name}, I'm happy to be here! :bell: \nI've sent an invite link to my dev team, they're on their way to validate this club! For security resons we have to manually verify club creation, so bear with us :smile:`);
+    guild.systemChannel.send(`Hello, ${guild.name}, I'm happy to be here! :bell:`); 
 
     // create the guild entry
     handler.setGuildValue('id', guild.id, guild);
@@ -184,7 +184,6 @@ client.on('messageReactionAdd', async (messageReaction, user) => {
                 if (meetings[meeting].active) {
                     // if the meeting coresponds to the active message
                     if (meeting == messageReaction.message.id) {
-                        console.log("reacted to the correct message!");
                         var users = meetings[meeting]['users'];
                         var guildUser = messageReaction.message.guild.member(user).id;
 
@@ -209,7 +208,7 @@ client.on('messageReactionAdd', async (messageReaction, user) => {
                         } else {
                             if (user.dmChannel) {
                                 user.dmChannel.send('You were not in the meeting when attendance opened, and so can\'t log attendance. If you believe this is a mistake please contact an exec of the club :hugging:');
-                            } else {
+                            } else if (user.id != client.id) {
                                 user.createDM()
                                 .then(dm => {
                                     dm.send('You were not in the meeting when attendance opened, and so can\'t log attendance. If you believe this is a mistake please contact an exec of the club :hugging:');
