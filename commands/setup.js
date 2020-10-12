@@ -17,16 +17,6 @@ module.exports = {
         // check if this person already has progress through the message chain
         var commandProgress = handler.getConfigVar('commandProgress');
         
-        // if there is no command progress entry (unlikely, mostly for during testing) create one
-        if (!commandProgress){
-            handler.setConfigVar('commandProgress', {'ongoingSetup': []});
-            commandProgress = {'ongoingSetup': []};
-
-        // if this command doesn't have any progress, create it for the command. Currently no other commands use this feature, but they could
-        } else if (!commandProgress.hasOwnProperty('ongoingSetup')) {
-            commandProgress['ongoingSetup'] = [];
-        }
-
         // try to pick up the progress
         var call = commandProgress.ongoingSetup.find(call => (call.guildID === message.guild.ID && 
                                                              call.userID === message.author.ID));
@@ -40,14 +30,14 @@ module.exports = {
             steps[call.step](message, args, prefix);
 
             // increase the step for next time
-            commandProgress.ongoingSetup[commandProgress.ongoingSetup.indexOf(call)].step++;
+            call.step++;
 
         } else {
             // start the setup with a new entry
             commandProgress.ongoingSetup.push({
-                guildID: message.guild.ID,
-                userID: message.author.ID,
-                step: 0
+                "guildID": message.guild.ID,
+                "userID": message.author.ID,
+                "step": 0
             });
 
             message.channel.send(`You are beginning to set up your server, please enter the same command to confirm your decision. \nYou can undo most of the changes with \`${prefix}cleanup\`, but @everyone role permissions, as well as some other settings, will stay chaged even after running the cleanup command. Only do this if you are absolutely sure this is what you want to do (it is recomended not to run this command on a server that is already established)`);
@@ -272,6 +262,7 @@ module.exports = {
                 - Step #6:\n
                 > You’re done! Now you can run ${prefix}setup again to activate spam protection on your server! :partying_face:\n                
                 `, {split: true});
+
                 break;
 
             // if it's neither of the above options, stall the progress and tell them they need a number
@@ -304,7 +295,7 @@ module.exports = {
 
         // permissions
         const newPermission = handler.getGuildValue('new', guild);
-        const members = handler.getGuildValue('members', guild);
+        const member = handler.getGuildValue('member', guild);
         const exec = handler.getGuildValue('exec', guild);
 
         // names and information and prompts for each needed piece of information
@@ -313,7 +304,7 @@ module.exports = {
             ['moderation', moderation, 'the channel you would like to use for private admin messages'], 
             ['bot_spam', bot_spam, 'the channel you would like to use for general bot commands'],
             ['new', newPermission, 'the role you would like to use for new, un-verified users'],
-            ['members', members, 'the role you would like to use for verified club members'],
+            ['member', member, 'the role you would like to use for verified club members'],
             ['announcements', announcements, 'the channel you would like to use for server announcements and attendance notifications'],
             ['exec', exec, 'the role you would like to use for club execs/administrators']
         ];
@@ -334,6 +325,7 @@ module.exports = {
                 
                 // if they did give arguments, try and set them
                 } else {
+                    var found = false;
                     // lol, I wrote this another way everywhere else, I forgot I could do it this way
                     var channel = message.guild.channels.fetch(args[0])
 
@@ -341,14 +333,30 @@ module.exports = {
                     .then(channel => {
                         if (channel) {
                             handler.setGuildValue(required[0], channel.id, guild);
-                        } else {
-                            message.channel.send(`Failed to find channel named ${args[0]}, try again please. You may need to change the channel name or create a new channel, this is totally fine just respond with \`${prefix}setup <channel_name>\`.`);
+                            found = true;
+                        } 
+                    })
+                    .error(e => {
+                        console.log(e);
+                        message.channel.send('An error occured while trying to fetch that channel, please try again.');
+                    });
+
+                    var role = message.guild.roles.fetch(args[0])
+
+                    .then(role => {
+                        if (role) {
+                            handler.setGuildValue(required[0], role.id, guild);
+                            found = true;
                         }
                     })
                     .error(e => {
                         console.log(e);
-                        message.channel.send('An error occured while trying to fetch that channel, please try again');
-                    });
+                        message.channel.send('An error occured while trying to fetch that channel, please try again.')
+                    })
+
+                    if (!found) {
+                        message.channel.send(`Failed to find channel/role named ${args[0]}, try again please. You may need to change the channel/role name or create a new channel/role, this is totally fine just respond with \`${prefix}setup <name>\`.`);
+                    }
                 }
                 break;
 
@@ -359,7 +367,7 @@ module.exports = {
         }
 
         // if they've done everything, let them know they're done
-        if (!reqInfo.filter(channel => typeof channel[1] !== 'string').length) {
+        if (!reqInfo.filter(channel => (typeof channel[1]) !== 'string').length) {
             message.channel.send(`Perfect! All channels and roles have been saved. Please continue to the next step by typing ${prefix}setup`);
         
         // if there are still more things to do stop them from progressing
@@ -372,7 +380,25 @@ module.exports = {
 
             if (call) commandProgress.ongoingSetup[commandProgress.ongoingSetup.indexOf(call)].step--;
 
-            handler.setConfigVar('commandProgress');
+            handler.setConfigVar('commandProgress', commandProgress);
+        }
+    },
+    
+    lastStep(message, args, prefix) {
+        message.channel.send(`Wonderful! :tada: \nYou have completed setup of your server! Go and have some fun!`);
+        
+        //delete the setup progress from this person, letting them run it again (not sure why they would want to do that though)
+        var commandProgress = handler.getConfigVar('commandProgress');
+    
+        // attempt to remove the correct progress entry
+        try {
+            var thisSetup = commandProgress.ongoingSetup.find(call => (call.guildID === message.guild && 
+                                                                    call.userID === message.author.ID));
+    
+            commandProgress.ongoingSetup.splice(commandProgress.ongoingSetup.indexOf(thisSetup), 1);      
+        } catch (e) {
+            console.log('Couldn\'t find an ongoing setup command after attempting to cleanup');
+            console.log(e);
         }
     },
 
@@ -382,23 +408,16 @@ module.exports = {
      */
     cleanup(message) {
         var commandProgress = handler.getConfigVar('commandProgress');
-
+    
         // attempt to remove the correct progress entry
         try {
             var thisSetup = commandProgress.ongoingSetup.find(call => (call.guildID === message.guild && 
                                                                     call.userID === message.author.ID));
-
+    
             commandProgress.ongoingSetup.splice(commandProgress.ongoingSetup.indexOf(thisSetup), 1);      
         } catch (e) {
             console.log('Couldn\'t find an ongoing setup command after attempting to cleanup');
             console.log(e);
         }
-    },
-
-    lastStep(message, args, prefix) {
-        message.channel.send(`Wonderful! :tada: \nYou have completed setup of your server! Go and have some fun!`);
-
-        //delete the setup progress from this person, letting them run it again (not sure why they would want to do that though)
-        cleanup(message);
     }
 }

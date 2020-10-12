@@ -14,7 +14,9 @@ const guildTemplate = {
         "prefix": {"permissions": "ADMINISTRATOR"}, 
         "reload": {"permissions": "ADMINISTRATOR"}, 
         "setpermissions": {"permissions": "ADMINISTRATOR"},
-        "setchannels": {"permissions": "ADMINISTRATOR"}
+        "setchannels": {"permissions": "ADMINISTRATOR"},
+        "open": {"permissions": "ADMINISTRATOR"},
+        "start": {"permissions": "ADMINISTRATOR"}
     },
     "meetings": {
 
@@ -165,7 +167,7 @@ module.exports = {
 
         // if the guild exists get the value from it
         if (thisGuild) {
-            if (thisGuild[value]) {
+            if (value in thisGuild) {
                 return thisGuild[value];
             } else {
                 console.log(`Tried to read ${value} from ${guild.name}, but it doesn't exist as a property. Setting to default and returning.`);
