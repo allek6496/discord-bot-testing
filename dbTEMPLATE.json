@@ -1,0 +1,16 @@
+{
+    "globalConfig": [],
+    "guildID": {
+        "guildConfig": [],
+
+        "users": {
+            "ID": {
+                "name": "First Last",
+                "email": "test@wrdsb.ca",
+                "meets": [
+                    "YEAR/MM/DD"
+                ]
+            }
+        }
+    }
+}

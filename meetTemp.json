@@ -1,0 +1,1699 @@
+{
+    "762759257636339802": {
+        "users": {
+            "bichc3017@wrdsb.ca": {
+                "name": "Cristian Bicheru",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 5520
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 3120
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4500
+                    }
+                ]
+            },
+            "keera6508@wrdsb.ca": {
+                "name": "Aditya Keerthi",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 5460
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2220
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 3180
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 3420
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3960
+                    }
+                ]
+            },
+            "cald********@***.com": {
+                "name": "Calder White",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 5400
+                    }
+                ]
+            },
+            "gaok9596@wrdsb.ca": {
+                "name": "Kevin Gao",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 5100
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2520
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 3060
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2700
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4560
+                    }
+                ]
+            },
+            "xiaoe5800@wrdsb.ca": {
+                "name": "Eric Xiao",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4800
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2280
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": null
+                    }
+                ]
+            },
+            "athas2070@wrdsb.ca": {
+                "name": "Sohil Athare",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4800
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2340
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 3060
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2220
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4020
+                    }
+                ]
+            },
+            "yanga6910@wrdsb.ca": {
+                "name": "Andrew Yang",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4680
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2460
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2640
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 1740
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4260
+                    }
+                ]
+            },
+            "irvic5144@wrdsb.ca": {
+                "name": "Callum Irving",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4800
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4440
+                    }
+                ]
+            },
+            "allek6496@wrdsb.ca": {
+                "name": "Kegan Allen",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 10380
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2520
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 3120
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2160
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4560
+                    }
+                ]
+            },
+            "choij9662@wrdsb.ca": {
+                "name": "Jiwon Choi",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4740
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2340
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2940
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2160
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3540
+                    }
+                ]
+            },
+            "yildb1622@wrdsb.ca": {
+                "name": "Bora Yildirim",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4740
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2460
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 3060
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2280
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 840
+                    }
+                ]
+            },
+            "chaup3074@wrdsb.ca": {
+                "name": "Pratham Chauhan",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4740
+                    }
+                ]
+            },
+            "perek6881@wrdsb.ca": {
+                "name": "Kaitlyn Pereira",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4560
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3540
+                    }
+                ]
+            },
+            "gej0232@wrdsb.ca": {
+                "name": "Jonathan Ge",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 13680
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": null
+                    }
+                ]
+            },
+            "xingr0840@wrdsb.ca": {
+                "name": "Robert Xing",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4500
+                    }
+                ]
+            },
+            "wange3441@wrdsb.ca": {
+                "name": "Evan Wang",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4560
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2220
+                    }
+                ]
+            },
+            "tangj9565@wrdsb.ca": {
+                "name": "Jon Tang",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4560
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2220
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2880
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 180
+                    }
+                ]
+            },
+            "munim8321@wrdsb.ca": {
+                "name": "Jehanzeb Munir",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4620
+                    }
+                ]
+            },
+            "xingl8561@wrdsb.ca": {
+                "name": "Leo Xing",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4560
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 1920
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 3000
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2160
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3540
+                    }
+                ]
+            },
+            "wangj3743@wrdsb.ca": {
+                "name": "Jim Wang",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4680
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2460
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 3060
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2340
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4560
+                    }
+                ]
+            },
+            "chent4452@wrdsb.ca": {
+                "name": "Tian Chen",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4680
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2460
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 3000
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2220
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4440
+                    }
+                ]
+            },
+            "kwonm6516@wrdsb.ca": {
+                "name": "Minseo Kwon",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4560
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3780
+                    }
+                ]
+            },
+            "zhanf2495@wrdsb.ca": {
+                "name": "Feng Zhang",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4440
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2400
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 3060
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2160
+                    }
+                ]
+            },
+            "shil3794@wrdsb.ca": {
+                "name": "Larry Shi",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4500
+                    }
+                ]
+            },
+            "nasit6988@wrdsb.ca": {
+                "name": "Tahir Nasir",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4620
+                    }
+                ]
+            },
+            "paten4599@wrdsb.ca": {
+                "name": "Neel Patel",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4380
+                    }
+                ]
+            },
+            "aruna0071@wrdsb.ca": {
+                "name": "Amruth Arunkumar",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4500
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 2940
+                    }
+                ]
+            },
+            "hima*******@***.com": {
+                "name": "Hima Sheth",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4440
+                    }
+                ]
+            },
+            "bjelv4480@wrdsb.ca": {
+                "name": "Vladimir Bjelica",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4440
+                    }
+                ]
+            },
+            "gupta0219@wrdsb.ca": {
+                "name": "Aviral Gupta",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4620
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2340
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 3000
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2220
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 2340
+                    }
+                ]
+            },
+            "yuany7003@wrdsb.ca": {
+                "name": "Yoyo Yuan",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4620
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4500
+                    }
+                ]
+            },
+            "deswk5202@wrdsb.ca": {
+                "name": "Kaniesa Deswal",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4560
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2340
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 3060
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2160
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3300
+                    }
+                ]
+            },
+            "tewam4981@wrdsb.ca": {
+                "name": "Mike Tewari",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4200
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2160
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3300
+                    }
+                ]
+            },
+            "chens4256@wrdsb.ca": {
+                "name": "Steven Chen",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4380
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2340
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2700
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2280
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4260
+                    }
+                ]
+            },
+            "mattm8260@wrdsb.ca": {
+                "name": "Matthew Matta",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4620
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2520
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3540
+                    }
+                ]
+            },
+            "tranw3046@wrdsb.ca": {
+                "name": "Will Tran",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4440
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2880
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2220
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4320
+                    }
+                ]
+            },
+            "bhato5205@wrdsb.ca": {
+                "name": "Om Bhatt",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4560
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 780
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3480
+                    }
+                ]
+            },
+            "chyev4436@wrdsb.ca": {
+                "name": "Vanessa Yan Wei Chye",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 1200
+                    }
+                ]
+            },
+            "shety2441@wrdsb.ca": {
+                "name": "Yash Sheth",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4500
+                    }
+                ]
+            },
+            "srikt6882@wrdsb.ca": {
+                "name": "Tejas Srikanth",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4260
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2460
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2820
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3540
+                    }
+                ]
+            },
+            "qadrn0630@wrdsb.ca": {
+                "name": "Nasif Qadri",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4500
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 360
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2940
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 780
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4500
+                    }
+                ]
+            },
+            "ahmea8547@wrdsb.ca": {
+                "name": "Ameera Ahmed",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4440
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2700
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3480
+                    }
+                ]
+            },
+            "zhend7600@wrdsb.ca": {
+                "name": "David Zheng",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4380
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2400
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2940
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2280
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3420
+                    }
+                ]
+            },
+            "zhanc9114@wrdsb.ca": {
+                "name": "Charles Zhang",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4200
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2160
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2820
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2040
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3540
+                    }
+                ]
+            },
+            "hawak2398@wrdsb.ca": {
+                "name": "Khalil Hawari",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4440
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2280
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2160
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 2520
+                    }
+                ]
+            },
+            "chana8034@wrdsb.ca": {
+                "name": "Ariel Chan",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4080
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 1920
+                    }
+                ]
+            },
+            "gaoy2351@wrdsb.ca": {
+                "name": "Yina Gao",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 2640
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 360
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 3060
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4500
+                    }
+                ]
+            },
+            "jis5638@wrdsb.ca": {
+                "name": "Skylar Ji",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4320
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2400
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 120
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 180
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4380
+                    }
+                ]
+            },
+            "laml5731@wrdsb.ca": {
+                "name": "Lucas Lam",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 300
+                    }
+                ]
+            },
+            "shara8586@wrdsb.ca": {
+                "name": "Anika Sharma",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4320
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2220
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3480
+                    }
+                ]
+            },
+            "romee9274@wrdsb.ca": {
+                "name": "Ethan Romero",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 660
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2280
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3480
+                    }
+                ]
+            },
+            "asifw7188@wrdsb.ca": {
+                "name": "Waleed Asif",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4140
+                    }
+                ]
+            },
+            "atifm4607@wrdsb.ca": {
+                "name": "Shahzeb Atif",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 3540
+                    }
+                ]
+            },
+            "limh8275@wrdsb.ca": {
+                "name": "Ethan Lim",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4140
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2940
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 1740
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3960
+                    }
+                ]
+            },
+            "wanga5693@wrdsb.ca": {
+                "name": "Angelina Wang",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4080
+                    }
+                ]
+            },
+            "zhoum3592@wrdsb.ca": {
+                "name": "Matthew Zhou",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4140
+                    }
+                ]
+            },
+            "wangs2997@wrdsb.ca": {
+                "name": "Sean Wang",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4260
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 780
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 1560
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3540
+                    }
+                ]
+            },
+            "kime2789@wrdsb.ca": {
+                "name": "Ellie Kim",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4080
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2220
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3780
+                    }
+                ]
+            },
+            "molah9240@wrdsb.ca": {
+                "name": "Hossein Molavi",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4020
+                    }
+                ]
+            },
+            "ahmes5182@wrdsb.ca": {
+                "name": "Sarah Ahmed",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4080
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3240
+                    }
+                ]
+            },
+            "kondv3297@wrdsb.ca": {
+                "name": "Varun Kondam",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4020
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3480
+                    }
+                ]
+            },
+            "syeda7599@wrdsb.ca": {
+                "name": "Ali Syed",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 2760
+                    }
+                ]
+            },
+            "tripa1729@wrdsb.ca": {
+                "name": "Arnav Tripathi",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 4200
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 300
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3420
+                    }
+                ]
+            },
+            "rezah9696@wrdsb.ca": {
+                "name": "Hooman Reza Nezhad",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 2460
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2280
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2460
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2280
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3360
+                    }
+                ]
+            },
+            "dut4514@wrdsb.ca": {
+                "name": "Trevor Du",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 3900
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2400
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2460
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4080
+                    }
+                ]
+            },
+            "radcj3148@wrdsb.ca": {
+                "name": "Jacob Radcliffe",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 900
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2160
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 3060
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3480
+                    }
+                ]
+            },
+            "hanj5074@wrdsb.ca": {
+                "name": "Jessica Han",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 3780
+                    }
+                ]
+            },
+            "yangf0928@wrdsb.ca": {
+                "name": "Fred Yang",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 3180
+                    }
+                ]
+            },
+            "xies4594@wrdsb.ca": {
+                "name": "Sophia Xie",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 3540
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 60
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2160
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4560
+                    }
+                ]
+            },
+            "nayap7054@wrdsb.ca": {
+                "name": "Pranjal Nayak",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 1920
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 1980
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2940
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 2040
+                    }
+                ]
+            },
+            "xut0033@wrdsb.ca": {
+                "name": "Tina Xu",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 2640
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2520
+                    }
+                ]
+            },
+            "liua4687@wrdsb.ca": {
+                "name": "Anthony Liu",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 1920
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 3000
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2340
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": null
+                    }
+                ]
+            },
+            "wangh1977@wrdsb.ca": {
+                "name": "Harry Wang",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 1800
+                    },
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2400
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 3000
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2280
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 2880
+                    }
+                ]
+            },
+            "mus1696@wrdsb.ca": {
+                "name": "Steven Mu",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 1020
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2040
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3900
+                    }
+                ]
+            },
+            "pariu2913@wrdsb.ca": {
+                "name": "Upasna Parikh",
+                "meets": [
+                    {
+                        "date": "2020-12-08",
+                        "duration": 240
+                    }
+                ]
+            },
+            "munij8321@wrdsb.ca": {
+                "name": "Jehanzeb Munir",
+                "meets": [
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2460
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2820
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2280
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4560
+                    }
+                ]
+            },
+            "kanhm2368@wrdsb.ca": {
+                "name": "Marcus Kanhai",
+                "meets": [
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2460
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2700
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 840
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3540
+                    }
+                ]
+            },
+            "abdua6627@wrdsb.ca": {
+                "name": "Abbas Abdulaziz",
+                "meets": [
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2340
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2400
+                    }
+                ]
+            },
+            "mam6903@wrdsb.ca": {
+                "name": "Michelle Ma",
+                "meets": [
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2400
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 3000
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2160
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4560
+                    }
+                ]
+            },
+            "wangc4574@wrdsb.ca": {
+                "name": "Cera Wang",
+                "meets": [
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2340
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3540
+                    }
+                ]
+            },
+            "shetr7624@wrdsb.ca": {
+                "name": "Rohan Shetty",
+                "meets": [
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2340
+                    }
+                ]
+            },
+            "cenke5224@wrdsb.ca": {
+                "name": "Emre Cenk",
+                "meets": [
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2280
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2460
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2160
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4380
+                    }
+                ]
+            },
+            "rusts5564@wrdsb.ca": {
+                "name": "Samer Rustum",
+                "meets": [
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2280
+                    }
+                ]
+            },
+            "erix******@***.com": {
+                "name": "Eric Xiao",
+                "meets": [
+                    {
+                        "date": "2021-04-20",
+                        "duration": 2160
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 3060
+                    }
+                ]
+            },
+            "call***********@***.com": {
+                "name": "Callum Irving",
+                "meets": [
+                    {
+                        "date": "2021-04-20",
+                        "duration": 720
+                    }
+                ]
+            },
+            "xing*********@***.com": {
+                "name": "Leo Xing",
+                "meets": [
+                    {
+                        "date": "2021-04-20",
+                        "duration": 120
+                    }
+                ]
+            },
+            "jay.******@***.com": {
+                "name": "Jay Ren",
+                "meets": [
+                    {
+                        "date": "2021-04-20",
+                        "duration": 60
+                    }
+                ]
+            },
+            "renj5722@wrdsb.ca": {
+                "name": "Jay Ren",
+                "meets": [
+                    {
+                        "date": "2021-04-20",
+                        "duration": 1920
+                    }
+                ]
+            },
+            "zhanl5542@wrdsb.ca": {
+                "name": "Luke Zhang",
+                "meets": [
+                    {
+                        "date": "2021-04-20",
+                        "duration": 1860
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 1740
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3480
+                    }
+                ]
+            },
+            "lix2485@wrdsb.ca": {
+                "name": "Xiang Li",
+                "meets": [
+                    {
+                        "date": "2021-04-20",
+                        "duration": 540
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4380
+                    }
+                ]
+            },
+            "alamr6071@wrdsb.ca": {
+                "name": "Ridwan Alam",
+                "meets": [
+                    {
+                        "date": "2021-04-20",
+                        "duration": 240
+                    },
+                    {
+                        "date": "2021-04-27",
+                        "duration": 1800
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 1680
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 960
+                    }
+                ]
+            },
+            "yud0042@wrdsb.ca": {
+                "name": "Daniel Yu",
+                "meets": [
+                    {
+                        "date": "2021-04-27",
+                        "duration": 420
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 1560
+                    }
+                ]
+            },
+            "yanr6721@wrdsb.ca": {
+                "name": "Robert Yan",
+                "meets": [
+                    {
+                        "date": "2021-04-27",
+                        "duration": 3060
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2280
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4560
+                    }
+                ]
+            },
+            "xian*******@***.com": {
+                "name": "Xiang Li",
+                "meets": [
+                    {
+                        "date": "2021-04-27",
+                        "duration": 600
+                    }
+                ]
+            },
+            "limo*********@***.com": {
+                "name": "Timothy Lu",
+                "meets": [
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2940
+                    }
+                ]
+            },
+            "sheed9333@wrdsb.ca": {
+                "name": "Derek Sheen",
+                "meets": [
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2940
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 2280
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3420
+                    }
+                ]
+            },
+            "kims8448@wrdsb.ca": {
+                "name": "Sooyeun Kim",
+                "meets": [
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2940
+                    },
+                    {
+                        "date": "2021-05-04",
+                        "duration": 1140
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 720
+                    }
+                ]
+            },
+            "salsc8814@wrdsb.ca": {
+                "name": "Calvin Salsali",
+                "meets": [
+                    {
+                        "date": "2021-04-27",
+                        "duration": 2880
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3540
+                    }
+                ]
+            },
+            "lut2407@wrdsb.ca": {
+                "name": "Timothy Lu",
+                "meets": [
+                    {
+                        "date": "2021-05-04",
+                        "duration": 1740
+                    },
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4440
+                    }
+                ]
+            },
+            "jason_schattman@wrdsb.ca": {
+                "name": "Jason Schattman",
+                "meets": [
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4680
+                    }
+                ]
+            },
+            "ngj5685@wrdsb.ca": {
+                "name": "Justin Ng",
+                "meets": [
+                    {
+                        "date": "2021-04-06",
+                        "duration": null
+                    }
+                ]
+            },
+            "gaoj5892@wrdsb.ca": {
+                "name": "Joshua Gao",
+                "meets": [
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4380
+                    }
+                ]
+            },
+            "desin4385@wrdsb.ca": {
+                "name": "Nethara De Silva",
+                "meets": [
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3480
+                    }
+                ]
+            },
+            "zhanb4094@wrdsb.ca": {
+                "name": "Barry Zhang",
+                "meets": [
+                    {
+                        "date": "2021-04-06",
+                        "duration": 4320
+                    }
+                ]
+            },
+            "yaakk7879@wrdsb.ca": {
+                "name": "Khaled Yaakoub Agha",
+                "meets": [
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3480
+                    }
+                ]
+            },
+            "luoj4514@wrdsb.ca": {
+                "name": "Jeffrey Luo",
+                "meets": [
+                    {
+                        "date": "2021-04-06",
+                        "duration": 1500
+                    }
+                ]
+            },
+            "chaul6655@wrdsb.ca": {
+                "name": "Lauryn Chau",
+                "meets": [
+                    {
+                        "date": "2021-04-06",
+                        "duration": 3180
+                    }
+                ]
+            },
+            "tepen9248@wrdsb.ca": {
+                "name": "Numan Tepe",
+                "meets": [
+                    {
+                        "date": "2021-04-06",
+                        "duration": 2460
+                    }
+                ]
+            },
+            "bans5290@wrdsb.ca": {
+                "name": "Siting Ban",
+                "meets": [
+                    {
+                        "date": "2021-04-06",
+                        "duration": 2460
+                    }
+                ]
+            }
+        }
+    }
+}
