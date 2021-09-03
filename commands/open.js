@@ -14,39 +14,29 @@ module.exports = {
      * @param {Message} message Discord message obect representing the triggering message.
      * @param {string Array} args The list of words following the triggering command (not used).
      */
-    execute(message, args) {
-        var announcementsID = handler.getGuildValue('announcements', message.guild);
+    async execute(message, args) {
+        var announcementsID = await handler.getGuildValue('announcements', message.guild);
 
         // if there is an announcements channel to send the message in
         if (announcementsID) {
             var announcements = message.guild.channels.resolve(announcementsID);
 
-            var meetings = handler.getGuildValue("meetings", message.guild);
-
             announcements.send('Attendance is open! React to this message with the check mark to mark your attendance and I\'ll dm you to confirm your sumbission! :slight_smile:')
-            .then((message) => {
+            .then(async message => {
                 message.react('✅');
 
-                var meeting = {
-                    active: true,
-                    users: {
-                        //user_id: {"valid": false >> present, true >> confirmed, "channel": ID of channel they were in}
-                    }
-                }
+                // await because this has to be finished before the loop starts, otherwise it won't find the meet we try to add to the user
+                await handler.newMeet(message.guild.id, {messageID: message.id});
 
                 //go through each channel, if it's a vc log each user in the vc into the meeting
                 message.guild.channels.cache.forEach(channel => {
                     if (channel.type === 'voice') {
                         channel.members.forEach(member => {
-                            if (!meeting['users'].hasOwnProperty(member.id)) {
-                                meeting['users'][member.id] = {"valid": false, "channel": channel.id};
-                            }
+                            // Add the meet to this user. Can't add twice, no need to await cause it'll finish on it's own time
+                            handler.addMeetByMessage(member.user.id, message.guild.id, message.id)
                         });
                     }
                 });
-
-                meetings[message.id] = meeting;
-                handler.setGuildValue('meetings', meetings, message.guild);
             });
 
         } else {

@@ -13,9 +13,9 @@ module.exports = {
      * @param {Message} message The message object of the triggering event.
      * @param {any} args Any arguments provided, either none or a command name.
      */
-    execute(message, args) {
+    async execute(message, args) {
         const handler = require('../configHandler.js');
-        const prefix = handler.getGuildValue('prefix', message.guild);
+        const prefix = await handler.getGuildValue('prefix', message.guild);
         
         const {commands} = message.client;
         const isDM = message.channel.type != 'text';
@@ -29,7 +29,13 @@ module.exports = {
         // case if there are no args, list all commands
         if (!args.length) {
 
-            /* new system, work in progress
+            //TODO: use embed
+            /* new system, work in progress (other things are more important than things looking nice)
+            If I make something new I'll try and use new systems but for now I won't bother overhauling stuff that already works
+
+            Ironic because this wasn't working
+
+            leave me alone ._.
 
             response.setAuthor("Attendance Bot", 
                                // rick and morty butter bot image
@@ -87,52 +93,66 @@ module.exports = {
             // old system using normal messages:
             data.push(`Here's a list of each of my commands: `);
 
-            var devs = handler.getConfigVar('devs');
+            data.push('> ');
+            var devs = await handler.getConfigVar('devs');
 
-            // only show commands the user has permissions to use
-            data.push(commands.map(command => {
-                var commandInfo = handler.getCommandInfo(message.guild, message.client, command.name);
+            handler.getGuildValue("commands", message.guild)
+            .then(guildCommands => {
+                commands.forEach(command => {
+                    if (guildCommands && command.name in guildCommands) {
+                        for (const info in guildCommands[command.name]) {
+                            command[info] = guildCommands[command.name][info];
+                        }
+                    }
 
-                if (commandInfo) {
-                    // if the command specifies required permissions, and the user doesn't have that, don't show them the option
-                    if (commandInfo['permissions']) {
-                        // if it's a dm channel, and the command requires anything other than default permissions, deny access (assume dm channels have 0 perms)
-                        if (commandInfo['permissions'] = "DEV") {
-                            if (!devs.includes(message.author.id.toString())) return false;
-                        } else if (!message.guild || !message.member.permissionsIn(message.channel).has(commandInfo['permissions'])) {
+                    // If they're a dev always show the dev commands
+                    if (devs.includes(message.author.id.toString())) {
+                        data[1] += command.name + ', ';
+                        return true;
+                    }
+
+                    if ('permissions' in command) {
+                        if (command['permissions'] == "DEV") {
+                            // They aren't a dev (case handled) then don't show it to them
+                            return false;
+                        // Otherwise make sure valid permissions are handled
+                        } else if (message.guild && message.member.permissionsIn(message.channel).has(command['permissions'])) {
                             return false;
                         }
                     }
 
                     // if the command specifies required channels, and this is not one of them don't show it. if it specifies no channels, it's fine to show
-                    if (commandInfo.hasOwnProperty('channels')) {
-                        if (!(commandInfo['channels'].includes(message.channel) && commandInfo['channels'].length)) {
+                    if ('channels' in command) {
+                        if (!(command['channels'].includes(message.channel) && command['channels'].length)) {
                             return false;
                         }
                     }
-                }
 
-                // if it's ok to use in a dm add the name to the list
-                if (isDM && !command.guildOnly && !command.hideHelp) {
-                    return command.name;
+                    // if it's ok to use in a dm add the name to the list
+                    if (isDM && !command.guildOnly && !command.hideHelp) {
+                        data[1] += command.name + ', ';
+                        return true;
+                    // if it's not a dm and it's ok to show, add the name to the list
+                    } else if (!isDM && !command.hideHelp) {
+                        data[1] += command.name + ', ';
+                        return true;
+                    // if it's neither of these is true, default to not adding.
+                    } else {
+                        return false;
+                    }
+                });
 
-                // if it's not a dm and it's ok to show, add the name to the list
-                } else if (!isDM && !command.hideHelp) {
-                    return command.name;
+                // remove the last `, ` from the end
+                data[1] = data[1].slice(0, -2);
 
-                // if it's neither of these is true, default to not adding.
-                } else {
-                    return false;
-                }
-            }).filter(e => e).join(', '));
+                // prompt a follow up message from them
+                data.push(`\nYou can send \`${prefix}help <command name>\` to get info on a specific command.`)
+    
+                // send all the messages at once, possibly splitting into multiple messages
+                return message.channel.send(data, {split: true});
+            }).catch(err => {console.log(`Error while requesting default help command in ${message.guild.name}\n${err}`)});
 
-            // prompt a follow up message from them
-            data.push(`\nYou can send \`${prefix}help <command name>\` to get info on a specific command.`)
-
-            // send all the messages at once, possibly splitting into multiple messages
-            return message.channel.send(data, {split: true});
-        
-        // WIP: make this use an embed as well
+        // TODO: make this use an embed as well
         } else {
             // all command names are lower case, so correct it for them if they used some capitals
             const name = args[0].toLowerCase();
@@ -141,7 +161,7 @@ module.exports = {
             const command = commands.get(name) || commands.find(c => c.aliases && c.aliases.includes(name));
 
             // retrieve the special command data and restrictions for this guild
-            const commandInfo = handler.getCommandInfo(message.guild, message.client, name);
+            const commandInfo = await handler.getCommandInfo(message.guild, message.client, name);
             
             // if the command couldn't be found
             if (!command) {
@@ -151,8 +171,8 @@ module.exports = {
             if (commandInfo) {
                 // if the command specifies permissions, but the user doesn't meet the requirements, tell them they can't use it
                 if (commandInfo['permissions']) {
-                    if (commandInfo['permissions'] = "DEV") {
-                        var devs = handler.getConfigVar('devs');
+                    if (commandInfo['permissions'] == "DEV") {
+                        var devs = await handler.getConfigVar('devs');
                         if (!devs.includes(message.author.id.toString())) return message.reply('You can\'t run that command! This command is for development purposes only.');
                     } if (!message.member.permissionsIn(message.channel).has(commandInfo['permissions'])) {
                         return message.reply('You do not have permissions here to run that command!');

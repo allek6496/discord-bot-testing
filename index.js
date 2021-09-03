@@ -116,7 +116,7 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
 
-    client.commands.set(command.name, command);
+    if ("execute" in command) client.commands.set(command.name, command);
 }
 
 client.on('message', async message => {
@@ -146,6 +146,7 @@ client.on('message', async message => {
     } else if (message.mentions.has(client.user) && message.guild && !message.mentions.has(message.guild.roles.everyone)) { 
         client.commands.get('hellothere').execute(message, args);
 
+    //TODO: Make this work with user verification through my email system
     //#region A 
     // if the message was sent in the new-members channel, delete the message and respond
     } else if (message.guild && message.channel.id == handler.getGuildValue("new_members", message.guild)) {
@@ -299,14 +300,14 @@ client.on('message', async message => {
         // if the command doesn't exist, don't continue
         if (!command) return;
 
-        var commandInfo = handler.getCommandInfo(message.guild, client, commandName);
+        var commandInfo = await handler.getCommandInfo(message.guild, client, commandName);
 
         // check for command info (this shouldn't be needed because every command should have a commandInfo entry)
         if (commandInfo) {
             // if they don't have the correct permissions, don't let them run the command
             if (commandInfo.hasOwnProperty('permissions')) {
                 if (commandInfo['permissions'] == "DEV") {
-                    var devs = handler.getConfigVar('devs');
+                    var devs = await handler.getConfigVar('devs');
         
                     // only allow the dev team to run this command
                     if (!devs.includes(message.author.id.toString())) {
@@ -358,9 +359,11 @@ client.on('guildCreate', guild => {
     guild.systemChannel.send(`Hello, ${guild.name}, I'm happy to be here! :bell:`); 
 
     // create the guild entry
-    handler.setGuildValue('id', guild.id, guild);
+    handler.createNewGuild(guild);
+    // handler.setGuildValue('id', guild.id, guild);
 
     // send me (the dev) a link to the server
+    //TODO: do this for each dev
     client.users.fetch('552890476089573396').send(`Bot was invited to ${guild.name}, here's the invite link:\n` + 
     guild.systemChannel.createInvite({
         maxAge: 0,
@@ -376,12 +379,12 @@ client.on('guildDelete', guild => {
 });
 
 // spam protection, giving the new role to new members so they can't get immediate access to the server
-client.on('guildMemberAdd', member => {
-    devs = handler.getConfigVar('devs');
+client.on('guildMemberAdd', async member => {
+    devs = await handler.getConfigVar('devs');
 
     // if the user was a dev, don't restrict them
     if (devs.includes(member.id)) {
-        var memberRole = handler.getGuildValue('member', member.guild);
+        var memberRole = await handler.getGuildValue('member', member.guild);
 
         // if there's no member role, the server probably isn't set up so it's fine to do nothing
         if (memberRole) {
@@ -390,7 +393,7 @@ client.on('guildMemberAdd', member => {
 
     // all other users should be given the new role, do nothing otherwise
     } else {
-        var newRole = handler.getGuildValue('new', member.guild)
+        var newRole = await handler.getGuildValue('new', member.guild)
         
 
         if (newRole) {
@@ -398,19 +401,6 @@ client.on('guildMemberAdd', member => {
         }
     }
 });
-
-// // checks for changes in voice chats
-// client.on('voiceStateUpdate', (oldState, newState) => {
-//     if (oldState.channel) {
-//         update(oldState.member, oldState.channel);
-//         // oldState.guild.systemChannel.send(`${oldState.member} just left ${oldState.channel.name}`);
-//     }
-
-//     if (newState.channel) {
-//         update(newState.member, newState.channel);
-//         // newState.guild.systemChannel.send(`${newState.member} just joined ${newState.channel.name}`);
-//     }
-// });
 
 client.on('messageReactionAdd', async (messageReaction, user) => {
     console.log(messageReaction);
@@ -420,97 +410,49 @@ client.on('messageReactionAdd', async (messageReaction, user) => {
         .catch(e => console.log(e));
     }
 
+    let messageID = messageReaction.message.id;
+    let guildID = messagreReaction.message.guild.id;
+
     if (messageReaction.emoji.name === '✅') {
-        var meetings = handler.getGuildValue('meetings', messageReaction.message.guild);
+        var meeting = await handler.getMeet(guildID, {messageID: messageID});
 
-        // go through each of the server's meetings
-        for (var meeting in meetings) {
-            if (meetings.hasOwnProperty(meeting)) {
-                // only check active meetings
-                if (meetings[meeting].active) {
-                    // if the meeting coresponds to the active message
-                    if (meeting == messageReaction.message.id) {
-                        // if the triggering user was the bot, don't continue
-                        if (user.bot) {
-                            console.log("Bot successfully reacted to the message.");
-                            return;
-                        };
+        // Check if a meeting was found tied to this message
+        if (meeting) {
+            // only check active meetings
+            if (meeting.active) {
+                // if the triggering user was the bot, don't continue
+                if (user.bot) {
+                    console.log("Bot successfully reacted to the message.");
+                    return;
+                };
 
-                        var users = meetings[meeting]['users'];
-                        var userID = messageReaction.message.guild.member(user).id;
+                var userID = user.id;
+                
+                let verified = await handler.log(userID, guildID, messageID)
 
-                        // if the guildUser was in a vc when attendance opened
-                        if (users.hasOwnProperty(userID)) {
-                            // if they've already been logged ignore
-                            if (users[userID].valid) continue;
-                            else {
-                                // log them as attended
-                                users[userID].valid = true;
+                // No harm in re-verifying, just don't spam them with messages
+                if (verified) {
+                    return;
+                } else {
+                    // dm a verification message
+                    if (user.dmChannel) {
+                        user.dmChannel.send('You\'ve successfully logged attendance!')
+                        .catch(e => {
+                            // give an error message that specifies whether or not the message has gone through, and who it tried to send to
+                            console.log(`Error in dm sending to ${user.username}. Attendance has been logged.\n${e}`);
+                        });
 
-                                // dm a verification message
-                                if (user.dmChannel) {
-                                    user.dmChannel.send('You\'ve successfully logged attendance!')
-                                    .catch(e => {
-                                        // give an error message that specifies whether or not the message has gone through, and who it tried to send to
-                                        if (users[userID].valid) {
-                                            console.log(`Error in dm sending to ${user.username}. Attendance has been logged.`);
-                                        } else {
-                                            console.log(`Error in dm sending to ${user.username}. Attendance has not been logged.`);
-                                        }
-                                        console.log(e);
-                                    });
-
-                                // if there's no existing dm, it will have to be created
-                                } else {
-                                    user.createDM()
-                                    .then(dm => {
-                                        // message them to say it's gone through
-                                        dm.send('You\'ve successfully logged attendance!')
-                                        .catch(e => {
-                                            // give an error message that specifies whether or not the message has gone through, and who it tried to send to
-                                            if (users[userID].valid) {
-                                                console.log(`Error in dm sending to ${user.username}. Attendance has been logged.`);
-                                            } else {
-                                                console.log(`Error in dm sending to ${user.username}. Attendance has not been logged.`);
-                                            }
-                                            console.log(e);
-                                        });
-                                    })
-                                    .catch(e => console.log(`Failed to create dm channel with ${user.username}. This may happen if the bot has been blocked.`));
-                                }
-                                handler.setGuildValue('meetings', meetings, messageReaction.message.guild); 
-                            }
-                        } else {
-                            // dm a message to let them know it won't work for them cause the bot didn't detect their pressence in the meeting
-                            if (user.dmChannel) {
-                                user.dmChannel.send('You were not in the meeting when attendance opened, and so can\'t log attendance. If you believe this is a mistake please contact an exec of the club :hugging:')
-                                .catch(e => {
-                                    // give an error message that specifies whether or not the message has gone through, and who it tried to send to
-                                    if (users[userID].valid) {
-                                        console.log(`Error in dm sending to ${user.username}. Attendance has been logged.`);
-                                    } else {
-                                        console.log(`Error in dm sending to ${user.username}. Attendance has not been logged.`);
-                                    }
-                                    console.log(e);
-                                });
-                            // if the bot has never messaged the user before, a channel will have to be set up (I think, i'm not totally sure this is the case)
-                            } else if (user.id != client.id) {
-                                user.createDM()
-                                .then(dm => {
-                                    dm.send('You were not in the meeting when attendance opened, and so can\'t log attendance. If you believe this is a mistake please contact an exec of the club :hugging:')
-                                    .catch(e => {
-                                        // give an error message that specifies whether or not the message has gone through, and who it tried to send to
-                                        if (users[userID].valid) {
-                                            console.log(`Error in dm sending to ${user.username}. Attendance has been logged.`);
-                                        } else {
-                                            console.log(`Error in dm sending to ${user.username}. Attendance has not been logged.`);
-                                        }
-                                        console.log(e);
-                                    });
-                                })
-                                .catch(e => console.log(`Failed to create dm channel with ${user.username}`));
-                            }
-                        }
+                    // if there's no existing dm, it will have to be created
+                    } else {
+                        user.createDM()
+                        .then(dm => {
+                            // message them to say it's gone through
+                            dm.send('You\'ve successfully logged attendance!')
+                            .catch(e => {
+                                console.log(`Error in dm sending to ${user.username}. Attendance has been logged.\n${e}`);
+                            });
+                        })
+                        .catch(e => console.log(`Failed to create dm channel with ${user.username}. This may happen if the bot has been blocked.`));
                     }
                 }
             }

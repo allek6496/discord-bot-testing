@@ -14,15 +14,18 @@ module.exports = {
     usage: '<args>',
     permissions: "ADMINISTRATOR",
     
-    execute(message, args) {
+    async execute(message, args) {
         // check if this person already has progress through the message chain
         var commandProgress = handler.getConfigVar('commandProgress');
         
-        // try to pick up the progress
-        var call = commandProgress.ongoingSetup.find(call => (call.guildID === message.guild.ID && 
-                                                              call.userID === message.author.ID));
+        var call;
+        // This is a bit outdated, but I won't bother trying to add it to the new system, it should work in theory
+        if (commandProgress && "ongoingSetup" in commandProgress) {
+            var call = commandProgress.ongoingSetup.find(call => (call.guildID === message.guild.ID && 
+                                                                  call.userID === message.author.ID));
+        }
         
-        const prefix = handler.getGuildValue('prefix', message.guild);
+        const prefix = await handler.getGuildValue('prefix', message.guild);
 
         // if we could pick up, call the next step
         if (call) {
@@ -37,13 +40,16 @@ module.exports = {
 
         } else {
             // start the setup with a new entry
+            if (!commandProgress) commandProgress = {};
+            if (!("ongoingSetup" in commandProgress)) commandProgress["ongoingSetup"] = []
+
             commandProgress.ongoingSetup.push({
                 "guildID": message.guild.ID,
                 "userID": message.author.ID,
                 "step": 0
             });
 
-            message.channel.send(`You are beginning to set up your server, please enter the same command to confirm your decision. \nYou can undo most of the changes with \`${prefix}cleanup\`, but @everyone role permissions, as well as some other settings, will stay chaged even after running the cleanup command. Only do this if you are absolutely sure this is what you want to do (it is recomended not to run this command on a server that is already established)`);
+            message.channel.send(`You are beginning to set up your server, please enter the same command to confirm your decision. \nIf you chose option 1, you can undo most of the changes with \`${prefix}cleanup\`. However, @everyone role permissions, as well as some other settings, will stay chaged even after running the cleanup command.`);
         }
 
         handler.setConfigVar('commandProgress', commandProgress);
@@ -51,7 +57,7 @@ module.exports = {
 
     // confirmation
     step1(message, args, prefix) {
-        message.channel.send(`You are beginning setup for ${message.guild.name}, please select which option you prefer by typing \`${prefix}setup <choice #>\`\n> 1: Quickly set up the whole server for me! (It is reccomended to use this on a fresh and unchanged server)\n> 2: Just tell me what I should do and I'll do it myself.`);
+        message.channel.send(`You are beginning setup for ${message.guild.name}, please select which option you prefer by typing \`${prefix}setup <choice #>\`\n> 1: Quickly set up the whole server for me! (It is reccomended to use this on a fresh and unchanged server. Reverse the effects with \`${prefix}cleanup\`)\n> 2: Just tell me what I should do and I'll do it myself. (It is reccomended to use this on an established server, or one in which you want more fine control over the layout.\n\nAll values can be manually changed later on.`);
     },
 
     // creation or confirmation of server pieces
@@ -245,7 +251,7 @@ module.exports = {
                     message.channel.send(`An error occurred!\n\`${error.message}\``);
                 });
 
-                message.channel.send(`Great! Step one done :smile:\nI created a few channels for you in the 'Created Channels' section, feel free to order them however you wish.\nThere is also a new role called ${message.guild.roles.resolve(handler.getGuildValue('exec', message.guild))}, please give this role to everyone you wish to have administrator permissions. You can do this by right clicking on their name, going down to 'Roles' and clicking the checkbox next to'exec'. `)
+                message.channel.send(`Great! Step one done :smile:\nI created a few channels for you in the 'Created Channels' section, feel free to order them however you wish.\nThere is also a new role called exec, please give this role to everyone you wish to have administrator permissions. You can do this by right clicking on their name, going down to 'Roles' and clicking the checkbox next to'exec'. `)
                 message.channel.send(`Type \`${prefix}setup\` again to continue to the next step after you've done this`)
                 break;
 
@@ -285,19 +291,31 @@ module.exports = {
     },
 
     // this one is only used if option 2 is chosen. This assigns the important values to the bot's storage
-    step3(message, args, prefix) {
+    // this might not be the best way to do this, but I'm so proud of it :D
+    async step3(message, args, prefix) {
         const guild = message.guild;
 
+        // Don't continue until every promise is finished
+        let data = await Promise.all([
+            handler.getGuildValue('new_members', guild),
+            handler.getGuildValue('announcements', guild),
+            handler.getGuildValue('moderation', guild),
+            handler.getGuildValue('bot_spam', guild),
+            handler.getGuildValue('new', guild),
+            handler.getGuildValue('member', guild),
+            handler.getGuildValue('exec', guild)
+        ]);
+
         /// channels
-        const new_members = handler.getGuildValue('new_members', guild);
-        const announcements = handler.getGuildValue('announcements', guild);
-        const moderation = handler.getGuildValue('moderation', guild);
-        const bot_spam = handler.getGuildValue('bot_spam', guild);
+        const new_members = data[0];
+        const announcements = data[1];
+        const moderation = data[2];
+        const bot_spam = data[3];
 
         // permissions
-        const newPermission = handler.getGuildValue('new', guild);
-        const member = handler.getGuildValue('member', guild);
-        const exec = handler.getGuildValue('exec', guild);
+        const newPermission = data[4];
+        const member = data[5];
+        const exec = data[6];
 
         // names and information and prompts for each needed piece of information
         const reqInfo = [
@@ -331,7 +349,7 @@ module.exports = {
                         var found = false;
 
                         try {
-                            var channel = message.guild.channels.resolve(args[0].substring(2, args[0].length-1))
+                            message.guild.channels.resolve(args[0].substring(2, args[0].length-1))
 
                             // after the channel is recieved, if successful, set the guild value to the channel id, otherwise ask to try again
                             .then(channel => {
@@ -350,7 +368,7 @@ module.exports = {
                         }
 
                         try {
-                            var role = message.guild.roles.resolve(args[0].substring(2, args[0].length-1))
+                            message.guild.roles.resolve(args[0].substring(2, args[0].length-1))
 
                             .then(role => {
                                 if (role) {
@@ -381,7 +399,7 @@ module.exports = {
 
         // if they've done everything, let them know they're done
         if (!reqInfo.filter(channel => (typeof channel[1]) !== 'string').length) {
-            message.channel.send(`Perfect! All channels and roles have been saved. Please continue to the next step by typing ${prefix}setup`);
+            message.channel.send(`Perfect! All channels and roles have been saved. Feel free to rename these channels and roles, their function is stored inside my massive brain (the cloud) regardless of their name. :smirk:\nPlease continue to the next step by typing \`${prefix}setup\``);
         
         // if there are still more things to do stop them from progressing
         } else {
@@ -408,26 +426,29 @@ module.exports = {
             var thisSetup = commandProgress.ongoingSetup.find(call => (call.guildID === message.guild && 
                                                                     call.userID === message.author.ID));
     
-            commandProgress.ongoingSetup.splice(commandProgress.ongoingSetup.indexOf(thisSetup), 1);      
+            commandProgress.ongoingSetup.splice(commandProgress.ongoingSetup.indexOf(thisSetup), 1);
+            handler.setConfigVar('commandProgress', commandProgress);
         } catch (e) {
             console.log('Couldn\'t find an ongoing setup command after attempting to cleanup');
             console.log(e);
         }
     },
-
+    
     /**
      * Removes the saved progress for a specific server
      * @param {Message} message The triggering message
      */
     cleanup(message) {
         var commandProgress = handler.getConfigVar('commandProgress');
-    
+        
         // attempt to remove the correct progress entry
         try {
             var thisSetup = commandProgress.ongoingSetup.find(call => (call.guildID === message.guild && 
-                                                                    call.userID === message.author.ID));
-    
-            commandProgress.ongoingSetup.splice(commandProgress.ongoingSetup.indexOf(thisSetup), 1);      
+                                                                       call.userID === message.author.ID));
+                
+            commandProgress.ongoingSetup.splice(commandProgress.ongoingSetup.indexOf(thisSetup), 1);
+            
+            handler.setConfigVar('commandProgress', commandProgress);
         } catch (e) {
             console.log('Couldn\'t find an ongoing setup command after attempting to cleanup');
             console.log(e);

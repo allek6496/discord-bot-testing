@@ -7,14 +7,8 @@ module.exports = {
     guildOnly: true,  
     usage: '<user> [leave blank for self]',
     hideHelp: false,
-
-    // countMeets(guild, UID) {
-    //     const handler = require('../configHandler.js');
-
-
-    // },
-
-    execute(message, args) {
+    
+    async execute(message, args) {
         let userID;
 
         if (args.length == 0) { // self
@@ -27,18 +21,20 @@ module.exports = {
             return;
         }
 
-        let user = handler.getUser(message.guild.id, userID);
+        let user = await handler.getUser(message.guild.id, userID);
         if (user) var meetCount = user.meets.length;
         else var meetCount = 0;
 
+        //TODO: make this settable by admins
         // Enough participation
         if (meetCount >= 9) {
+            //TODO: also check for email and promt an actual register (register to be made)
             if (user.name == "N/A") message.channel.send(`${message.client.users.resolve(userID).username} has been verified for ${meetCount} meets! This is enough to qualify for a club credit, but you're not done yet! I'm afraid I don't know your name! :slight_smile:\nPlease use the command \`${handler.getGuildValue("prefix", message.guild)}setname <your full name>\` to finish verifying your attendance. `);
             else message.channel.send(`${message.client.users.resolve(userID).username} has been verified for ${meetCount} meets. This is enough to qualify for a club credit! :clap:`);
         // nonzero participation
         } else if (meetCount) {
             if (user.name == "N/A") message.channel.send(`${message.client.users.resolve(userID).username} has been verified for ${meetCount} meets, but I'm afraid I don't know your name! :slight_smile:\nPlease use the command \`${handler.getGuildValue("prefix", message.guild)}setname <your full name>\` to finish verifying your attendance. `);
-            else message.channel.send(`${message.client.users.resolve(userID).username} has been verified for ${meetCount} meets. This is sadly not enough for a club credit :sob:, but I hope you had fun! If you're returning to SJAM next year, please consider coming back to CS Club!`);
+            else message.channel.send(`${message.client.users.resolve(userID).username} has been verified for ${meetCount} meets. This is sadly not enough for a club credit :sob:, but I hope you had fun!`);
             
         } else {
             message.reply(`Sorry! I didn't find any meetings under this account. Assuming you came to at least one meeting, please claim this under your email address by running \`${handler.getGuildValue("prefix", message.guild)}claim <email address>\``);

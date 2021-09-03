@@ -4,12 +4,16 @@ const fs = require('fs');
 module.exports = {
     name: 'gmeet',
     aliases: ['meet'],
-    description: 'Input a google meeting attendance file, input data into the database.',
+    description: 'Input a google meeting attendance file, input data into the database. WIP',
     args: false,
     guildOnly: true,  
     usage: '<file>',
-    hideHelp: false,
-    permissions: "ADMINISTRATOR",
+    // hideHelp: false,
+    // permissions: "ADMINISTRATOR",
+    permissions: "DEV",
+
+//TODO: Low priority right now, but still needs to be done to give freedom to execs
+
 
     /**
      * Turns duration into int showing seconds.
@@ -59,6 +63,7 @@ module.exports = {
                         data.push(line.split(','));
                     });
 
+                    //TODO: don't do this
                     var meets = require('../meetTemp.json');
                     const guildID = message.guild.id;
 
@@ -80,6 +85,7 @@ module.exports = {
                             if (shift==0) var name = entry[0] + " " + entry[1];
                             else var name = entry[0];
 
+                            //TODO: change to using a handler.createUnclaimed. This will automatically search for a valid user, otherwise store in the guild's unclaimed 
                             if (guildID in meets) {
                                 if (meets[guildID]["users"].hasOwnProperty(email)) {
                                     meets[guildID]["users"][email]["meets"].push(meetEntry);
@@ -99,6 +105,7 @@ module.exports = {
                         }
                     });
 
+                    //TODO: remove
                     fs.writeFile('./meetTemp.json', JSON.stringify(meets), (e) => {
                         if (e) {
                             console.log(`Error thrown while writing to meetTemp.json`);

@@ -17,7 +17,8 @@ module.exports = {
         const handler = require('../configHandler.js');
         var userID = args[0].substring(3, args[0].length-1);
 
-        var meetings = handler.getGuildValue('meetings', message.guild);
+        //TODO: bad
+        var meetings = handler.getGuildValue('meets', message.guild);
 
         var channels = message.guild.channels.cache;
         var voiceChannel = null;
@@ -33,6 +34,7 @@ module.exports = {
             }
         });
 
+        Object.keys(meetings).forEach
         for (var meeting in meetings) {
             if (meetings.hasOwnProperty(meeting)) {
                 if (meetings[meeting].active) {
@@ -57,6 +59,6 @@ module.exports = {
         }
         
 
-        handler.setGuildValue('meetings', meetings, message.guild);
+        handler.setGuildValue('meets', meetings, message.guild);
     }
 }

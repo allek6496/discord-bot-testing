@@ -15,7 +15,7 @@ module.exports = {
         
         this.transporter = nodemailer.createTransport({
             service: 'gmail',
-            auth
+            auth: auth
         });
 
         return;
@@ -37,7 +37,7 @@ module.exports = {
             text: contents
         };
         
-        this.transporter.sendMail(mailOptions, (error, info) => {
+        return this.transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
                 console.log(error);
                 return false;

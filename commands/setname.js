@@ -10,17 +10,20 @@ module.exports = {
     permissions: "ADMINISTRATOR",
 
     execute(message, args) {
-        const user = handler.getUser(message.guild.id, message.author.id);
+        const user = handler.getUser(message.author.id);
 
         // if the user exists already
         if (user) {
-            if (user.name == "N/A") {
+            if ("email" in user) {
+                // 
+
                 user.name = args.join(' ');
-                message.channel.send(`Great! I've updated your name to ${user.name}`);
-                handler.setUser(message.guild.id, message.author.id, user.name, user.email, user.meets);
+                user.save().then(user => {
+                    message.channel.send(`Great! I've updated your name to ${user.name}`);
+                });
             }
         } else {
-            //TODO: Change this lol
+            // idk what this means, it's fine?
             message.channel.send(`Sorry! :confused:\nWe couldn't seem to find an entry for you yet! You may need to claim your attendance first using the command \`${handler.getGuildValue("prefix", message.guild)}claim <email-address>\``);
         }
         
