@@ -1,5 +1,5 @@
 const handler = require('../configHandler.js');
-const emailer = require('../emailHandler.js');
+const emailer = require('../functions/emailHandler.js');
 const {SnowflakeUtil} = require('discord.js');
 const crypto = require('crypto');
 
@@ -9,13 +9,14 @@ if (!process.env.TOKEN) {
 
 // some code taken from justinboyerwriter.com (highly adapted)
 const encrypt = email => {
-    console.log(process.env.KEY);
-    console.log(process.env.KEY.length);
+    // console.log(process.env.KEY);
+    // console.log(process.env.KEY.length);
     let cypher = crypto.createCipheriv("aes256", process.env.KEY, process.env.IV);
     return cypher.update(email, "utf8", "hex") + cypher.final("hex");
 }
 
 const decrypt = code => {
+    if (typeof(code) != "string" || code.length != 64) return "";
     console.log(code);
     let cypher = crypto.createDecipheriv("aes256", process.env.KEY, process.env.IV);
     // cypher.setAutoPadding(false);
@@ -23,8 +24,7 @@ const decrypt = code => {
 }
 
 module.exports = {
-    name: 'claim',
-    aliases: ['claimAttendance'],
+    name: 'verify',
     description: 'Register your Discord account with a wrdsb email address, granting you access to clubs and attendance.',
     args: true,
     usage: "`followed by `<email address>` OR `code <code>",
@@ -43,128 +43,125 @@ module.exports = {
         let prefix = await handler.getGuildValue("prefix", message.guild);
 
         if (user && user.email && user.name) {
-            message.channel.send("You're already verified! Your account is fully set up. To check if your information is correct, use ")
+            message.channel.send(`You're already verified! Unfortunately, you can't ***double verify***. To check if your information is correct, use \`${prefix}myname\``)
             // i never know what to return here, null, false, true, NaN... They're all handled the same but it's still a decision I have to make, a weight I must bear. As I sit here at 9:22pm working away I feel my bones decay and rot even though I just went for a walk
             return null;
         } if (user && user.email) {
-            
-        }
+            message.channel.send(`You're almost done! Now just add your name using the command \`${prefix}setname <first> <last>\``);
+        } if (user) {
+            // if they've got a blank user account tied to their id, but no email, check for a valid code
+            // if the code checks out, add the email to their account and save it, just like before
+            // then sync all their meetings from unclaimed. Addding a name is needed to 
+        } else {
+            // check for an email and do the exact same thing as before
 
-//TODO: COMMAND DISABLED UNTIL FURTHER PROGRESS ELSEWHERE
+            if (args[0].includes('@')) {    
+                let email = args[0];
+                let found = await handler.findEmail(email);
 
-//         //TODO: Add multiple times 
-//         // first check if they've already done this. If they've finished the process, there should be a user object for them in handler.getUser
-
-//         // If they pass in a valid email, retrieve their attendance count and email a code to them
-//         if (args[0].includes('@')) {
-//             if (!message.guild) {
-//                 message.channel.send("Please use this half of the command in the server you wish to claim the attendance of. You can send the code the email gives you in this dm channel if you like.");
-//                 return;
-//             }
-
-//             if (await handler.getUser(message.guild.id, message.author.id)) {
-//                 message.reply("you've already done this! You can't do it multiple times :laughing:");
-//                 return;
-//             }
-
-//             let email = args[0];
-            
-//             if (email.split('@')[1] === "wrdsb.ca") {
-
-//                 let meetNum = this.getMeets(message.guild, message.author.id, email).length;
-
-//                 if (meetNum == 0) {
-//                     return message.reply("I didn't find any recorded meets under your account! :sob:\n\nPlease check you've put in the correct email and are logged into the correct discord account. If you believe this is a mistake, please contact an exec.");
-//                 }
-
-//                 let code = message.guild.id.toString() + '|' + email;
-
-//                 let contents = 
-// `
-// Hi there!
-
-// You currently have ${meetNum} unverified attendances, please claim them now by sending this code via DM to AttendanceTracker#5186.
-
-// ~claim code ${encrypt(code)}
-
-// Please don't share this code with anyone else, or they may be able to claim your attendance logs. Once you send it, all your attendance will be claimed and you won't be able to run this command again.
-
-// Thanks!
-// CS Club Attendance Tracker.
-// `;
+                if (found) {
+                    return message.channel.send(`This email was found in another account!`);
+                }
                 
-//                 if (!emailer.sendEmail(contents, "Please verify your account to claim attendance!", email)) {
-//                     message.reply(`There's been an error sending mail to ${email}`);
-//                 } else {
-//                     message.reply(`Success, we have sent the email to ${email}. You may need to check your spam folder :sob: because Gmail thinks we are a bit SUS :flushed:`);
-//                     if (message.guild) {
-//                         message.delete({timeout: 1000})
-//                             .catch(console.error);
-//                     }
-//                 }
-//             } else {
-//                 message.reply("Please enter a valid wrdsb email address");
-//             }
-//         } else if (args[0] === "code") {
-//             // The code should be of the form "GUILDID|email@wrdsb.ca"
-//             let decrypted = decrypt(args[1]).split('|');
-//             let email = decrypted[1];
-//             let guildID = decrypted[0];
-            
-//             // There's 0 chance it randomly includes this haha. It must've worked
-//             if (!email.includes("@wrdsb.ca")) {
-//                 return message.reply("That code was invallid. Please make sure you copied the whole command from the email.");
-//             }
+                if (email.split('@')[1] === "wrdsb.ca") {   
+                    let code = email;
+    
+                    let contents = 
+    `
+Hi there!
 
-//             if (message.guild) {
-//                 var guild = message.guild;
-//             // If this is a dm channel, look for the guild with this id
-//             } else {
-//                 var guild = await message.client.guilds.resolve(guildID);
-//             }
+You're beginning to set up your user account, please validate your email address by sending this command via DM to AttendanceTracker#5186.
 
-//             if (await handler.getUser(guild.id, message.author.id)) {
-//                 message.reply("You've already done this! You can't do it multiple times :laughing:");
-//                 return;
-//             }
+~verify code ${encrypt(code)}
 
-//             // check if they have any google meet meets. if they do, pull their name from there and use that. if no google meets are found, still log their meetings, name them "NO NAME GIVEN" and ask them to run ~setname "full name", warning an invalid name could invalidate attendance eligibility
-//             const meetTemp = require("../meetTemp.json");
-//             let name;
+Please don't share this code with anyone else, or they may be able to claim your account. This action is ireversible.
 
-//             // Check if the guild has anything, and if it does, does it have this user. 
-//             //TODO: Check other servers for a name under this account.
-//             if (meetTemp && meetTemp.hasOwnProperty(guild.id) && meetTemp[guild.id]["users"].hasOwnProperty(email)) {
-//                 name = meetTemp[guild.id]["users"][email]["name"];
-//             } else {
-//                 name = "N/A";
-//                 message.channel.send("No name has been found for you! Please update your name using the command `~setname <your-full-name>`\nThis won't be acessible by other users, only the exec team will be able to view it for the purposes of verifying attendance.");
-//                 //I think this works the way I want?
-//             }
+Thanks!
+CS Club Attendance Tracker.
+    `;
+                    
+                    if (!emailer.sendEmail(contents, "Please verify your account to claim attendance!", email)) {
+                        message.reply(`There's been an error sending mail to ${email}`);
+                    } else {
+                        message.reply(`Success, we have sent the email to ${email}. You may need to check your spam folder :sob: because Gmail thinks we are a bit SUS :flushed:`)
+                        .then(reply => {
+                            if (message.guild) {
+                                setTimeout(() => {
+                                    message.delete()
+                                    .catch(e => console.log(e));
+                                }, 1000)
+                                
+                                setTimeout(() => {
+                                    reply.delete()
+                                    .catch(e => console.log(e));
+                                }, 10000);
+                            }
+                        });
+                    }
+                } else {
+                    message.reply("Please enter a valid wrdsb email address");
+                }
+            } else if (args[0] === "code") {
+                // always delete the code, much bigger deal than email
+                if (message.guild) {
+                    message.delete()
+                    .catch(e => console.log(e));
+                }
+                
+                // The code should be of the form "abcde1234@wrdsb.ca"
+                let email = decrypt(args[1]);
+                
+                // There's 0 chance it randomly includes this haha. It must've worked
+                if (!email.includes("@wrdsb.ca")) {
+                    return message.reply("That code was invallid. Please make sure you copied the whole command from the email.");
+                }
 
-//             let oldnum = await handler.getAttendance(message.author.id, guild.id).length;
-            
-//             handler.setUser(guild.id, message.author.id, name, email, this.getMeets(guild, message.author.id, email));
+                // from here, they have a valid email. use this email to make a use account for them, leaving name blank
+                handler.addUser(message.author.id, "N/A", email)
+                .then(user => {
+                    message.channel.send(`Updated! To finish this process, please give your name using \`${prefix}setname <first> <last>\``);
+                });
 
-//             //TODO: getMeets needs to be changed/removed
-//             let meets = this.getMeets(guild, message.author.id, email);
+                // Keeping this just in case
 
-
-//             // meets.forEach(date => {
-//             //     handler.addMeet(guild.id, message.author.id, date);
-//             // });
-
-//             message.channel.send(`Updated! ${meets.length - oldnum} meets have been added to your account!`)
-
-//             // Only delete the message if it's in a guild. It'll throw an error otherwise.
-//             if (message.guild) {
-//                 return message.delete({timeout: 100})
-//                     .catch(console.error);
-//             } else {
-//                 return;
-//             }
-//         } else {
-//             message.channel.send("What? :confused:\nI'm not sure what that is! Please see `~help claim` for usage instructions.")
-//         }
+                // check if they have any google meet meets. if they do, pull their name from there and use that. if no google meets are found, still log their meetings, name them "NO NAME GIVEN" and ask them to run ~setname "full name", warning an invalid name could invalidate attendance eligibility
+                // const meetTemp = require("../meetTemp.json");
+                // let name;
+    
+                // // Check if the guild has anything, and if it does, does it have this user. 
+                // //TODO: Check other servers for a name under this account.
+                // if (meetTemp && meetTemp.hasOwnProperty(guild.id) && meetTemp[guild.id]["users"].hasOwnProperty(email)) {
+                //     name = meetTemp[guild.id]["users"][email]["name"];
+                // } else {
+                //     name = "N/A";
+                //     message.channel.send("No name has been found for you! Please update your name using the command `~setname <your-full-name>`\nThis won't be acessible by other users, only the exec team will be able to view it for the purposes of verifying attendance.");
+                //     //I think this works the way I want?
+                // }
+    
+                // let oldnum = await handler.getAttendance(message.author.id, guild.id).length;
+                
+                // handler.setUser(guild.id, message.author.id, name, email, this.getMeets(guild, message.author.id, email));
+    
+                // //TODO: getMeets needs to be changed/removed
+                // let meets = this.getMeets(guild, message.author.id, email);
+    
+    
+                // // meets.forEach(date => {
+                // //     handler.addMeet(guild.id, message.author.id, date);
+                // // });
+    
+                // message.channel.send(`Updated! ${meets.length - oldnum} meets have been added to your account!`)
+    
+                // // Only delete the message if it's in a guild. It'll throw an error otherwise.
+                // if (message.guild) {
+                //     return message.delete({timeout: 100})
+                //         .catch(console.error);
+                // } else {
+                //     return;
+                // }
+            } else {
+                message.channel.send(`What? :confused:\nI'm not sure what that is! Please see \`${prefix}help verify\` for usage instructions.`)
+            }
+        }
     }
 }

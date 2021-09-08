@@ -12,7 +12,7 @@ module.exports = {
     // permissions: "ADMINISTRATOR",
     permissions: "DEV",
 
-//TODO: Low priority right now, but still needs to be done to give freedom to execs
+//TODO: Low priority right now, but still needs to be done to give freedom to execs to use google meets
 
 
     /**
@@ -65,7 +65,7 @@ module.exports = {
 
                     //TODO: don't do this
                     var meets = require('../meetTemp.json');
-                    const guildID = message.guild.id;
+                    const guildId = message.guild.id;
 
                     data.forEach(entry => {
                         // console.log(entry);
@@ -86,14 +86,14 @@ module.exports = {
                             else var name = entry[0];
 
                             //TODO: change to using a handler.createUnclaimed. This will automatically search for a valid user, otherwise store in the guild's unclaimed 
-                            if (guildID in meets) {
-                                if (meets[guildID]["users"].hasOwnProperty(email)) {
-                                    meets[guildID]["users"][email]["meets"].push(meetEntry);
+                            if (guildId in meets) {
+                                if (meets[guildId]["users"].hasOwnProperty(email)) {
+                                    meets[guildId]["users"][email]["meets"].push(meetEntry);
                                 } else {
-                                    meets[guildID]["users"][email] = {"name": name, "meets": [meetEntry]};
+                                    meets[guildId]["users"][email] = {"name": name, "meets": [meetEntry]};
                                 }
                             } else {
-                                meets[guildID] = {
+                                meets[guildId] = {
                                     "users": {
                                         [email]: {
                                             "name": name, 

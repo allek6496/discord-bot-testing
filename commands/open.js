@@ -19,24 +19,33 @@ module.exports = {
 
         // if there is an announcements channel to send the message in
         if (announcementsID) {
-            var announcements = message.guild.channels.resolve(announcementsID);
+            var announcements = await message.guild.channels.resolve(announcementsID);
+
+            if (!announcements) {
+                return message.channel.send('Something strange happpened! It appears you\'ve defined an announcement channel, but I can\'t find it! Please make sure your server is fully set up using the setup command before running this');
+            }
 
             announcements.send('Attendance is open! React to this message with the check mark to mark your attendance and I\'ll dm you to confirm your sumbission! :slight_smile:')
             .then(async message => {
+                //TODO: this might be broken
                 message.react('✅');
 
                 // await because this has to be finished before the loop starts, otherwise it won't find the meet we try to add to the user
                 await handler.newMeet(message.guild.id, {messageID: message.id});
 
                 //go through each channel, if it's a vc log each user in the vc into the meeting
-                message.guild.channels.cache.forEach(channel => {
-                    if (channel.type === 'voice') {
-                        channel.members.forEach(member => {
-                            // Add the meet to this user. Can't add twice, no need to await cause it'll finish on it's own time
-                            handler.addMeetByMessage(member.user.id, message.guild.id, message.id)
-                        });
-                    }
-                });
+                message.guild.channels.fetch()
+                .then(channels => {
+                    channels.forEach(channel => {
+                        if (channel.type === 'GUILD_VOICE') {
+                            for (const [memberID, member] of channel.members) {
+                                console.log(member, "was present");
+                                // Add the meet to this user. Can't add twice, no need to await cause it'll finish on it's own time
+                                handler.addMeetByMessage(member.user.id, message.guild.id, message.id)
+                            }
+                        }
+                    });
+                }).catch(e => console.log(e));
             });
 
         } else {

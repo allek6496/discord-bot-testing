@@ -31,7 +31,7 @@ module.exports = {
             message.reply(`You have not been in any meetings.`);
         } else {
             message.reply(`This is a list of meetings you have joined and how long you were in them for:`);
-            message.channel.send(reply, {split: true});
+            message.channel.send(reply);
         }
     },
 
@@ -49,22 +49,22 @@ module.exports = {
         
         // if there's no data at all (no meetings happening anywhere) we know there must be no time at all
         if (on_start) {
-            for (var channelID in on_start) {
-                var channel = on_start[channelID];
+            for (var channelId in on_start) {
+                var channel = on_start[channelId];
 
                 // if this user has spent time in this channel
                 if(channel.hasOwnProperty(member.id)) {
                     // if they joined and haven't left yet, assume for timing they just left
-                    if (channel[member.id].length % 2 === 1) times[channelID] = currentTime;
-                    else times[channelID] = 0;
+                    if (channel[member.id].length % 2 === 1) times[channelId] = currentTime;
+                    else times[channelId] = 0;
                     
                     // start out with the current time, and alternate subtracting and adding to get the total time spent in the call
                     var mod = -1;
                     channel[member.id].forEach(log => {
-                        times[channelID] += log*mod 
+                        times[channelId] += log*mod 
                         mod *= -1;
                     });
-                    console.log(`${member.user.username} is being evaluated: ${channelID} for ${times[channelID]} ms`);
+                    console.log(`${member.user.username} is being evaluated: ${channelId} for ${times[channelId]} ms`);
                 }
             }
         }

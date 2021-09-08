@@ -24,8 +24,8 @@ module.exports = {
 
             message.channel.send(`Opening attendence for these channels (all the channels with an active meeting): `);
             
-            for (var channelID in onStart) {
-                var channel = message.guild.channels.resolve(channelID)
+            for (var channelId in onStart) {
+                var channel = message.guild.channels.resolve(channelId)
                 message.channel.send(`> ${channel}`);
                 channels.push(channel);
             }            

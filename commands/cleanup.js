@@ -19,7 +19,7 @@ module.exports = {
     args: false,
     guildOnly: true,  
     hideHelp: false,
-    permissions: "ADMINISTRATOR",
+    permissions: "DEV",
 
     /**
      * Mainly for admin use, removes the effects of setup for easier testing and to revert the server to a previous state more easily. 
@@ -48,14 +48,22 @@ module.exports = {
         ]).catch(err => {console.log(`Error requesting data for server cleanup in ${message.guild.name}\n${err}`)});
 
         for (let i = 0; i < data.length; i++) {
-            // delete 4 channels
-            if (i < 4) {
-                let channel = message.guild.channels.resolve(data[i]);
-                if (channel) channel.delete().catch(err => {`Failed to delete channel in ${message.guild.name}\n${err}`});
-            // and 4 roles
-            } else {
-                let role = message.guild.roles.resolve(data[i]);
-                if (role) role.delete().catch(err => {`Failed to delete role in ${message.guild.name}\n${err}`});
+            // these are part-way temp values, dont try and fetch them it won't work
+            if (["false", "true", false, true].includes(data[i])) continue;
+            else {
+                // delete 4 channels
+                if (i < 4) {
+                    message.guild.channels.fetch(data[i])
+                    .then(channel => {
+                        if (channel) channel.delete().catch(err => {`Failed to delete channel in ${message.guild.name}\n${err}`});
+                    }).catch(e => console.log(`Error fetching channel for cleanup\n${e}`));
+                // and 4 roles
+                } else {
+                    message.guild.roles.fetch(data[i])
+                    .then(role => {
+                        if (role) role.delete().catch(err => {`Failed to delete role in ${message.guild.name}\n${err}`});
+                    }).catch(e => console.log(e));
+                }
             }
         }
 
@@ -70,7 +78,7 @@ module.exports = {
         configValues.forEach(val => handler.setGuildValue(val, false, message.guild));
         
         // some decent everyone permissions, I forget what they are
-        message.guild.roles.everyone.setPermissions(new Permissions(70274625))
+        message.guild.roles.everyone.setPermissions(Permissions.DEFAULT);
         
         // resets the setup function progress in this server
         setup.cleanup(message);
@@ -80,7 +88,7 @@ module.exports = {
         if (commands) {
             for (var command in Object.values(commands)) {
                 // only affect commands with channel restrictions
-                if ("channels" in command && command.channels.length) {
+                if (command && ("channels" in command) && command.channels.length) {
                     command.channels = command.channels.filter(channel => {
                         !data.includes(channel)
                     });
@@ -89,6 +97,8 @@ module.exports = {
             handler.setGuildValue('commands', commands, message.guild);
         }
         
-        message.channel.send('Your server has been cleaned up!');
+        message.channel.send('Your server has been cleaned up!')
+        // this just happened to me lol
+        .catch(e => console.log(`Error sending from the channel, it was probably deleted haha`));
     }
 }

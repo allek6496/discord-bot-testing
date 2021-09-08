@@ -5,7 +5,7 @@ module.exports = {
     aliases: ['att'],
     description: 'Check a user\'s verified attendance',
     guildOnly: true,  
-    usage: '<user> [leave blank for self]',
+    usage: '<@user> [leave blank for self]',
     hideHelp: false,
     
     async execute(message, args) {
@@ -21,24 +21,26 @@ module.exports = {
             return;
         }
 
-        let user = await handler.getUser(message.guild.id, userID);
-        if (user) var meetCount = user.meets.length;
+        let user = await handler.getUser(userID);
+        if (user) var meetCount = user.meets.filter(meet => meet.valid && meet.meet.guildId == message.guild.id).length;
         else var meetCount = 0;
 
-        //TODO: make this settable by admins
-        // Enough participation
-        if (meetCount >= 9) {
-            //TODO: also check for email and promt an actual register (register to be made)
-            if (user.name == "N/A") message.channel.send(`${message.client.users.resolve(userID).username} has been verified for ${meetCount} meets! This is enough to qualify for a club credit, but you're not done yet! I'm afraid I don't know your name! :slight_smile:\nPlease use the command \`${handler.getGuildValue("prefix", message.guild)}setname <your full name>\` to finish verifying your attendance. `);
-            else message.channel.send(`${message.client.users.resolve(userID).username} has been verified for ${meetCount} meets. This is enough to qualify for a club credit! :clap:`);
-        // nonzero participation
-        } else if (meetCount) {
-            if (user.name == "N/A") message.channel.send(`${message.client.users.resolve(userID).username} has been verified for ${meetCount} meets, but I'm afraid I don't know your name! :slight_smile:\nPlease use the command \`${handler.getGuildValue("prefix", message.guild)}setname <your full name>\` to finish verifying your attendance. `);
-            else message.channel.send(`${message.client.users.resolve(userID).username} has been verified for ${meetCount} meets. This is sadly not enough for a club credit :sob:, but I hope you had fun!`);
+        message.author.send(`You have been verified in ${meetCount} meetings in ${message.guild.name}`); 
+
+        // //TODO: merge this into one command with other info commands. Show as a number, and a check/x for whether or not it's enough for a credit
+        // // Enough participation
+        // if (meetCount >= 9) {
+        //     //TODO: also check for email and promt an actual register (register to be made)
+        //     if (user.name == "N/A") message.channel.send(`${message.client.users.resolve(userID).username} has been verified for ${meetCount} meets! This is enough to qualify for a club credit, but you're not done yet! I'm afraid I don't know your name! :slight_smile:\nPlease use the command \`${handler.getGuildValue("prefix", message.guild)}setname <your full name>\` to finish verifying your attendance. `);
+        //     else message.channel.send(`${message.client.users.resolve(userID).username} has been verified for ${meetCount} meets. This is enough to qualify for a club credit! :clap:`);
+        // // nonzero participation
+        // } else if (meetCount) {
+        //     if (user.name == "N/A") message.channel.send(`${message.client.users.resolve(userID).username} has been verified for ${meetCount} meets, but I'm afraid I don't know your name! :slight_smile:\nPlease use the command \`${handler.getGuildValue("prefix", message.guild)}setname <your full name>\` to finish verifying your attendance. `);
+        //     else message.channel.send(`${message.client.users.resolve(userID).username} has been verified for ${meetCount} meets. This is sadly not enough for a club credit :sob:, but I hope you had fun!`);
             
-        } else {
-            message.reply(`Sorry! I didn't find any meetings under this account. Assuming you came to at least one meeting, please claim this under your email address by running \`${handler.getGuildValue("prefix", message.guild)}claim <email address>\``);
-        }
+        // } else {
+        //     message.reply(`Sorry! I didn't find any meetings under this account. Assuming you came to at least one meeting, please claim this under your email address by running \`${handler.getGuildValue("prefix", message.guild)}claim <email address>\``);
+        // }
 
     }
  

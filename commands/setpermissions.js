@@ -38,14 +38,15 @@ const validPermissions = [
 
 module.exports = {
     name: 'setpermissions',
-    description: `Gives a specific command a required permission to be run. This is a very important command for security reasons. To see the list of options, enter options instead of a command name. To remove restrictions, enter none instead of a command name. To see the current restrictions on a command, only include the command and no permissions to set it to (you can also use the help command).`,
+    description: `Gives a specific command a required permission to be run. To see the list of options, enter options instead of a command name. To remove restrictions, enter none instead of a command name. To see the current restrictions on a command, only include the command and no permissions to set it to (you can also use the help command).\nImportant commands come pre-defined with ADMINISTRATOR permission requirements, and commands meant to be used by members have no requirements. Only use this command if you know what you're doing.`,
     args: true,
     guildOnly: true,
     usage: '<command name> <permission required>',
     hideHelp: false,
     aliases: ['permissions'],
-    permissions: "ADMINISTRATOR",
+    permissions: "DEV",
 
+//TODO: make this require admin instead of dev
     execute(message, args) {
         // give them the list of permissions in a nice to see format. Takes kinda long to send though :/
         if (args[0] === 'options') {

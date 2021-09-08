@@ -39,10 +39,10 @@ db.once('open', function() {
         },
 
         // Store the ID of the guild that this meeting was inside of
-        guildID: String,
+        guildId: String,
 
         // Keep track of the message linked to this meeting. Become useless upon closure of the meeting
-        anouncementID: String,
+        announcementID: String,
 
         // Whether or not the meet is currently running
         active: {
@@ -103,8 +103,14 @@ db.once('open', function() {
         commands: {
             type: Map,
             of: {
-                permissions: String,
-                channels: [String] // List of snowflakes for valid channels
+                permissions: {
+                    type: String,
+                    default: ""
+                },
+                channels: [{
+                    type: String,
+                    default: ""
+                }] // List of snowflakes for valid channels
             }
         },
 
@@ -123,11 +129,6 @@ db.once('open', function() {
                 ref: "Meet"
             }] // When put into the user's meets, assume all are verified
         }],
-
-        members: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Member"
-        }]
     });
 
     Guild = mongoose.model("Guild", guildSchema);
@@ -182,8 +183,8 @@ const dmSettings = {"prefix": '~'};
  * @async
  */
 function addUser(ID, name, email, meets=[]) {
-    if (!typeof(ID) != "string") {
-        return console.log(`Invalid user ID type. Expected string, recieved ${typeof(ID)}: ${ID}`);
+    if (typeof(ID) != "string") {
+        return Promise.reject(`Invalid user ID type. Expected string, recieved ${typeof(ID)}: ${ID}`);
     }
     
     return User.create({
@@ -196,6 +197,11 @@ function addUser(ID, name, email, meets=[]) {
     });
 }
 
+function findEmail(email) {
+    return User.findOne({email: email}).exec()
+    .catch(e => console.log(e));
+}
+
 /**
  * Returns the user object with a given id.
  * @param {Snowflake} ID ID of the user to get
@@ -204,7 +210,7 @@ function addUser(ID, name, email, meets=[]) {
  */
 function getUser(ID) {
     return User.findOne({id: ID})
-    .populate("meets")
+    .populate("meets.meet")
     .exec()
     .catch(err => {
         console.log(`Error getting user with id ${ID}\n${err}`);
@@ -214,16 +220,16 @@ function getUser(ID) {
 /**
  * Gets the list of dates a user has attended and been verified for from a specific guild
  * @param {Snowflake} uID User ID
- * @param {Snowflake} guildID ID of the guild to get this user's attendance in
+ * @param {Snowflake} guildId ID of the guild to get this user's attendance in
  * @returns List of dates the user attended in YYYY-MM-DD format
  * @async
  */
- async function getAttendance(uID, guildID) {
+ async function getAttendance(uID, guildId) {
     let user = await getUser(uID);
     let out = [];
 
     for (let meet of user.meets) {
-        if (meet.valid && meet.meet.guildID == guildID) {
+        if (meet.valid && meet.meet.guildId == guildId) {
             out += [meet.meet.date.toISOString().substring(0, 9)] // should be YYYY-MM-DD
         } 
     }
@@ -234,21 +240,28 @@ function getUser(ID) {
 /**
  * Logs a user as valid in a certain meet. Just slightly easier than getUser
  * @param {Snowflake} uID ID of the user to log
- * @param {Snowflake} guildID ID of the guild to log in
+ * @param {Snowflake} guildId ID of the guild to log in
  * @param {Snowflake} messageID ID of the message connected to the meet, for id purposes
- * @returns {boolean} Whether or not they were already verified
+ * @returns {int} 0: they weren't present, 1: they were present and already verified, 2: they were present and just verified
  * @async
  */
-function log(uID, guildID, messageID) {
-    getUser(uID)
+function log(uID, guildId, messageID) {
+    return getUser(uID)
     .then(user => {
-        let verified = false;
+        // don't let unverified users log
+        if (!user || !user.name || user.name == 'N/A') {
+            // console.log("Failed to find a user");
+            return Promise.reject("UNVERIFIED");
+        }
         
+        let verified = 0;
+
         // Go through each meet, looking for one with valid guild and message, and log it as validated
         user.meets.some(meet => {
-            if (meet.meet.guildID == guildID && meet.meet.guildID == messageID) {
-                verified = user.meet.valid;
-                user.meet.valid = true;
+            if (meet.meet.guildId == guildId && meet.meet.announcementID == messageID) {
+                if (meet.valid) verified = 1;
+                else verified = 2;
+                user.meets[user.meets.indexOf(meet)].valid = true;
                 return true;
             } return false;
         });
@@ -265,13 +278,15 @@ function log(uID, guildID, messageID) {
 
 /**
  * Creates a new meeting.
- * @param {String} guildID ID of the guild to make the new meeting in
+ * @param {String} guildId ID of the guild to make the new meeting in
  * @param {Object} args {`date`, `messageID`, `active`}
  * @returns {Promise<Meet>} Promise for the created meet.
  * @async
  */
-function newMeet(guildID, args) {
+function newMeet(guildId, args) {
     let messageID, date, active;
+
+    active = true;
     
     if ("messageID" in args) messageID = args.messageID;
     if ("date" in args) date = args.date;
@@ -283,55 +298,46 @@ function newMeet(guildID, args) {
         if (date) {
             return Meet.create({
                 date: date,
-                guildID: guildID,
+                guildId: guildId,
                 announcementID: messageID,
                 active: active
+            }).then(meet => {
+                // console.log('1', meet);
+                Guild.updateOne({id: guildId}, {$push: {meets: meet._id}}).exec();
             });
         } else {
-            let date = SnowflakeUtil.deconstruct(messageID).date;
-            
-            // e.g. "21" dont worry about "01" situation, that's a while away lol
-            let year = date.getFullYear().toString();
-            
-            // Starts at 0 for some reason
-            let month = date.getMonth() + 1;  
-            
-            // Ensure the date is always 2 digits
-            if (month < 10) month = '0' + month.toString();
-            else month = month.toString();
-            
-            // Same with day
-            let day = date.getDate();
-            
-            if (day < 10) day = '0' + day.toString();
-            else day = day.toString();
-            
-            let thisDate = [year, month, day].join("-");
+            let thisDate = Date.now();
             
             return Meet.create({
                 date: thisDate,
-                guildID: guildID,
+                guildId: guildId,
                 announcementID: messageID,
                 active: active
-            })
+            }).then(meet => {
+                // console.log('2', meet);
+                Guild.updateOne({id: guildId}, {$push: {meets: meet._id}}).exec();
+            });
         }
     } else {
         return Meet.create({
             date: date,
-            guildID: guildID,
+            guildId: guildId,
             active: active
+        }).then(meet => {
+                // console.log('3', meet);
+                Guild.updateOne({id: guildId}, {$push: {meets: meet._id}}).exec();
         });
     }
 }
 
 /**
- * Finds a meet given the guildID and either messageID or date
- * @param {Snowflake} guildID ID of the guild to look in
+ * Finds a meet given the guildId and either messageID or date
+ * @param {Snowflake} guildId ID of the guild to look in
  * @param {Object} args {`messageID`, `date`} One is required to run. Can search with either. Will default to messageID given both.
  * @returns Promise for the meet requested
  * @async
  */
-function getMeet(guildID, args) {
+function getMeet(guildId, args) {
     let messageID, date;
     if ('messageID' in args) messageID = args.messageID;
     if ('date' in args) date = args.date;
@@ -340,13 +346,15 @@ function getMeet(guildID, args) {
         console.log("Tried to get meet with no information");
     } else if (messageID) {
         return Meet.find({
-            guildID: guildID,
+            guildId: guildId,
             announcementID: messageID
         }).then(meets => {
             if (meets.length) {
                 return meets[0]
             } else {
-                console.log(`Failed to find meet with messageID ${messageID} in ${guildID}`);
+                // as stated elsewhere, this is fine because it's inside of a promise.
+                // these @async commands can't return non-promises, because they're often .then'ed
+                console.log(`Failed to find meet with messageID ${messageID} in ${guildId}`);
                 return null;
             }
         }).catch(err => {console.log(`Error finding meet with messageID ${messageID}\n${err}`)});
@@ -360,13 +368,13 @@ function getMeet(guildID, args) {
                 $gte: start,
                 $lte: end
             }, 
-            guildID: guildID
+            guildId: guildId
         }).then(meets => {
-            // If it exists, add it to the user's list of attended meets
-            if (meets.length()) {
-                if (meets.length > 1) console.log(`WARNING, MULTIPLE MEETINGS ON DATE ${date} IN GUILD ${guildID} RETURNING ONE AT RANDOM`);
-                return meet;
-
+            // if the meet was found, return the most recent on the day
+            if (meets.length) {
+                if (meets.length > 1) console.log(`WARNING, MULTIPLE MEETINGS ON DATE ${date} IN GUILD ${guildId} RETURNING MOST RECENT`);
+                let greatest = Math.max.apply(Math, meets.map(meet => {return meet.date.getTime()}));
+                return meets.find(meet => meet.date.getTime() == greatest);
             } else {
                 return null;
             }
@@ -379,21 +387,21 @@ function getMeet(guildID, args) {
 
 /**
  * Gets all users that were present in a specific meeting, verified and unverified.
- * @param {Snowflake} guildID ID of the guild to look in
+ * @param {Snowflake} guildId ID of the guild to look in
  * @param {Object} args {`messageID`, `date`} One is required to run. Can search with either. Will default to messageID given both.
  * @returns {[User]} Returns list of users that were a part of this meeting
  */
-async function meetMembers(guildID, args) {
+async function meetMembers(guildId, args) {
     // First look for the meet
-    let meet = await getMeet(guildID, args);
+    let meet = await getMeet(guildId, args);
 
     return User.find({
         meets: {$in: [{
             meet: meet._id,
             valid: {$exists: true}
         }]}
-    }).populate('meets')
-    .catch(err => {console.log(`Error finding all members present in meets matching ${args} in guild ${guildID}\n${err}`)});
+    }).populate('meets.meet')
+    .catch(err => {console.log(`Error finding all members present in meets matching ${args} in guild ${guildId}\n${err}`)});
 }
 
 
@@ -401,20 +409,20 @@ async function meetMembers(guildID, args) {
 /**
  * Adds a meet to a user in a specific guild using the attahced announcement message.
  * @param {Snowflake} uID ID of the user to add the meeting to
- * @param {Snowflake} guildID ID of the guild the meeting belongs to
+ * @param {Snowflake} guildId ID of the guild the meeting belongs to
  * @param {Snowflake} messageID ID of the message attached to the meeting
  * @returns {Promise<Meet>} Returns a promise for the meeting added
  * @async
  */
-function addMeetByMessage(uID, guildID, messageID) {
-    return getMeet(guildID, {messageID: messageID})
+function addMeetByMessage(uID, guildId, messageID, valid=false) {
+    return getMeet(guildId, {messageID: messageID})
     .then(meet => {
         if (meet) {
             User.updateOne({
                 id: uID
             }, {
-                $push: {meet: meet._id, valid:false}
-            }).catch(err => {console.log(`Error adding meet with messageID ${messageID} to user ${uID} in ${guildID}\n${err}`)});
+                $push: {meets: {meet: meet._id, valid: valid}} 
+            }).catch(err => {console.log(`Error adding meet with messageID ${messageID} to user ${uID} in ${guildId}\n${err}`)});
 
             return meet;
         } else {
@@ -427,32 +435,32 @@ function addMeetByMessage(uID, guildID, messageID) {
 /**
  * Assigns a meet to a user. Will always set the meet as verified. This will pick the "first" meeting if multiple lie on the same day. I'm nost sure if this will be used, messageID is always better.
  * @param {Snowflake} uID ID of the user to add attendance to
- * @param {Snowflake} guildID The id of the guild in question
+ * @param {Snowflake} guildId The id of the guild in question
  * @param {String} date A string representing the date
  * @returns {Meet} The meeting added
  * @async
  */
-function addMeetByDate(uID, guildID, date) {
-    return getMeet(guildID, {date: date})
+function addMeetByDate(uID, guildId, date) {
+    return getMeet(guildId, {date: date})
     .then(async meet => {
         // If it exists, add it to the user's list of attended meets
         if (meet) {
             User.updateOne({
                 id: uID
             }, {
-                $push: {meet: meet._id, valid: true}
+                $push: {meets: {meet: meet._id, valid: true}}
             });
 
             return meet;
         // If it doesn't create a meet and then add it to the user
         } else {
-            let thisMeet = await newMeet(guildID, {date: date})
+            let thisMeet = await newMeet(guildId, {date: date})
             .catch(err => {console.log(`Error building new meet using only date ${date}\n${err}`)});
 
             User.updateOne({
                 id: uID
             }, {
-                $push: {meet: thisMeet._id, valid: true}
+                $push: {meets: {meet: thisMeet._id, valid: true}}
             }).catch(err => {
                 console.log(`Error pushing new meet to user ${uID}'s meet list\n${err}`);
             });
@@ -469,6 +477,7 @@ function addMeetByDate(uID, guildID, date) {
 * Creates a guild document in the database
 * @param {Guild} guild The guild object to create an entry for
 * @returns {Object(guild)} Returns the guild object, as though just pulled from Guild.findOne(). No promise or async
+* @async
 */
 function createNewGuild(guild) {
     const newGuild = new Guild({
@@ -477,13 +486,12 @@ function createNewGuild(guild) {
         prefix: '~',
     });
  
-    newGuild.save()
+    return newGuild.save()
     .then(guild => {
-     console.log(`Created guild named ${guild.name}`);
+        console.log(`Created guild named ${guild.name}`);
+        return newGuild;
     });
- 
-    return newGuild;
- }
+  }
  
 
 /**
@@ -495,9 +503,10 @@ function createNewGuild(guild) {
  */
 function setGuildValue(value, newValue, guild) {
     if (guild === null) {
-        return;
-    } else if (typeof guild === 'string') {
-        return console.log('ERROR: PASSED ID AS GUILD, PLEASE PASS GUILD OBJECT');
+        // I don't want an error message here, so just resolve as null
+        return Promise.resolve(null);
+    } else if (typeof(guild) === 'string') {
+        return Promise.reject('ERROR: PASSED ID AS GUILD, PLEASE PASS GUILD OBJECT');
     }
 
     let query = {};
@@ -518,33 +527,34 @@ function setGuildValue(value, newValue, guild) {
 function getGuildValue(value, guild) {
     if (guild == null) {
         if (value in dmSettings) {
-            return dmSettings[value];
+            // need to return a 
+            return Promise.resolve(dmSettings[value]);
         } else {
             console.log(`${value} is not set as a default value for dm channels`);
-            return null;
+            return Promise.resolve(null);
         }
-    } else if (typeof guild === 'string') {
-        return console.log('ERROR: PASSED ID AS GUILD, PLEASE PASS GUILD OBJECT');
+    } else if (typeof(guild) === 'string') {
+        // an error is probably better form, but this should work and it saves space
+        return Promise.reject('ERROR: PASSED ID AS GUILD, PLEASE PASS GUILD OBJECT');
     }
-
 
     const thisGuild = Guild.findOne({id: guild.id}, [value, "name"]);
 
-    if (value in ["meets", "members"]) {
-        thisGuild.populate(value);
-
-    // I don't know if this works or not
-    } else if (value == "unclaimed") {
+    if (value == "meets") {
         thisGuild.populate("meets")
+    } else if (value == "unclaimed") {
+        thisGuild.populate("unclaimed.meets")
     }
 
     return thisGuild
-    .then(thisGuild => {
+    .then(async thisGuild => {
+        // console.log("Looking for", value, "found", thisGuild);
         if (thisGuild && value in thisGuild) {
             // console.log(`Found that ${value} is ${thisGuild[value]} in ${thisGuild.name}`)
             return thisGuild[value];
         } else if (!thisGuild) {
-            const newGuild = createNewGuild(guild);
+            // await to prevent multiple creations
+            const newGuild = await createNewGuild(guild);
                     
             if (value in newGuild) {
                 return newGuild[value];
@@ -577,13 +587,15 @@ async function getCommandInfo(guild, client, commandName) {
     
     if (!clientCommand) {
         console.log(`Tried to pull value for ${commandName} in ${guild.name}, but there is no information for this loaded into the discord client. Most likely requested a command which doesn't exist.`);
-        return null;
+        return Promise.resolve(null);
     }
 
     if (!guild) {
-        return clientCommand;
+        return Promise.resolve(clientCommand);
     }
-    
+
+    // I know I'm really inconsistent with using await vs .then, I don't really have a method to this madness
+    // however, after await it returns a promise, so normal returns work following this keyword
     let commands = await getGuildValue("commands", guild);
 
     if (!commands || !(commandName in commands)) {
@@ -607,9 +619,10 @@ async function getCommandInfo(guild, client, commandName) {
  */
 async function setCommandInfo(guild, commandName, newInfo) {
     // This does nothing in a dm channel
-    if (!guild) return;
+    if (!guild) return Promise.resolve(null);
 
     var commands = await getGuildValue('commands', guild);
+    if (!commands) commands = {};
 
     // There's a much smarter way to handle this, but I can't be bothered, cause this should also work (though it'll probably be a bit slower)
     if ((commands && commandName in commands) || //The command is saved and has some value (normal case)
@@ -617,9 +630,11 @@ async function setCommandInfo(guild, commandName, newInfo) {
         guild.client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName))) {
         
         commands[commandName] = newInfo;
+        console.log(commands, newInfo);
         return setGuildValue('commands', commands, guild);
 
     } else {
+        // setGuildValue('commands', commands, guild);
         return console.log(`Tried to set ${commandName} to ${newInfo} in ${guild.name}, but it doesn't exist as a valid command!`);
     }
 }
@@ -632,8 +647,10 @@ async function setCommandInfo(guild, commandName, newInfo) {
  */
  function deleteGuild(guild) {
     if (guild == null) {
-        console.log('Tried to delete a dm channel')
-        return false;
+        console.log('Tried to delete a dm channel');
+        // i suppose the better way to do this would be to use Promise.resolve(handler.function()) outside if this module, that way I don't have to return like this
+        // but this works so chill I'm tyring to finish this
+        return Promise.resolve(false);
     }
 
     return Guild.deleteOne({id: guild.id})
@@ -695,6 +712,7 @@ module.exports = {
     getMeet: getMeet,
     meetMembers: meetMembers,
     log: log,
+    findEmail: findEmail,
     getAttendance: getAttendance,
     getCommandInfo: getCommandInfo,
     setCommandInfo: setCommandInfo,

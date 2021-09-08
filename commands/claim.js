@@ -1,5 +1,5 @@
 const handler = require('../configHandler.js');
-const emailer = require('../emailHandler.js');
+const emailer = require('../functions/emailHandler.js');
 const {SnowflakeUtil} = require('discord.js');
 const crypto = require('crypto');
 
@@ -27,9 +27,10 @@ module.exports = {
     aliases: ['claimAttendance'],
     description: 'Officially claim both Google Meet as well as Discord based attendance.',
     args: true,
+    permissions: "DEV",
     usage: "`followed by `<email address>` OR `code <code>",
     guildOnly: false,
-    hideHelp: false,
+    hideHelp: true,
 
     /**
      * Allows a user to claim their attendance under their real identity by providing an email address.
@@ -99,7 +100,7 @@ module.exports = {
 //             // The code should be of the form "GUILDID|email@wrdsb.ca"
 //             let decrypted = decrypt(args[1]).split('|');
 //             let email = decrypted[1];
-//             let guildID = decrypted[0];
+//             let guildId = decrypted[0];
             
 //             // There's 0 chance it randomly includes this haha. It must've worked
 //             if (!email.includes("@wrdsb.ca")) {
@@ -110,7 +111,7 @@ module.exports = {
 //                 var guild = message.guild;
 //             // If this is a dm channel, look for the guild with this id
 //             } else {
-//                 var guild = await message.client.guilds.resolve(guildID);
+//                 var guild = await message.client.guilds.resolve(guildId);
 //             }
 
 //             if (await handler.getUser(guild.id, message.author.id)) {

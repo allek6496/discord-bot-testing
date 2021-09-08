@@ -1,10 +1,10 @@
 module.exports = {
     name: 'log',
     aliases: ['mark'],
-    description: 'Manually marks a user\'s attendance for a specific meeting',
+    description: 'Manually marks a user\'s attendance for a specific meeting. Note that this will only work if the active meeting opened today.',
     args: true,
     guildOnly: true,  
-    usage: '<user> <voice channel>',
+    usage: '<@user>',
     hideHelp: false,
     permissions: "ADMINISTRATOR",
 
@@ -13,52 +13,27 @@ module.exports = {
      * @param {Message} message Discord message obect representing the triggering message.
      * @param {string Array} args The list of words following the triggering command (not used).
      */
-    execute(message, args) {
+    async execute(message, args) {
         const handler = require('../configHandler.js');
         var userID = args[0].substring(3, args[0].length-1);
+        var user = await handler.getUser(userID);
 
-        //TODO: bad
-        var meetings = handler.getGuildValue('meets', message.guild);
-
-        var channels = message.guild.channels.cache;
-        var voiceChannel = null;
-
-        var defaulted = null;
-        channels.forEach(channel => {
-            if (channel.name.includes(args[1])) {
-                voiceChannel = channel;
-                defaulted = false;
-            } else if (channel.type == "voice" && defaulted !== false) {
-                defaulted = true;
-                voiceChannel = channel;
-            }
-        });
-
-        Object.keys(meetings).forEach
-        for (var meeting in meetings) {
-            if (meetings.hasOwnProperty(meeting)) {
-                if (meetings[meeting].active) {
-                    if (meeting.hasOwnProperty(userID)) {
-                        meetings[meeting]['users'][userID] = true;
-                        message.channel.send(`Logged <@!${userID}>'s attendance!`);
-                    } else {
-                        if (voiceChannel) {
-                            meeting['users'][userID] = {"valid": true, "channel": voiceChannel.id};
-                            message.channel.send(`Logged <@!${userID}>'s attendance!\nThey were not detected in the call, logging anyway. :confused:`);
-                        } else if (defaulted) {
-                            meeting['users'][userID] = {"valid": true, "channel": voiceChannel.id};
-                            message.channel.send(`Logged <@!${userID}>'s attendance!\nThey were not detected in the call, logging anyway. :confused:`);
-                            message.channel.send(`No voice channel detected, set to <#${voiceChannel.id}>.`)
-                        } else {
-                            message.channel.send(`Could not locate a voice channel in this server, failed to log attendance`);
-                        }
-                    }
-                    break;
+        handler.getMeet(message.guild.id, {"date": Date.now()})
+        .then(meet => {
+            // It probably should be in there if they've asked to log in it
+            if (meet && "announcementID" in meet) {
+                if (user.meets.some(userMeet => userMeet.meet.announcementID == meet.announcementID)) {
+                    return message.channel.send(`<@!${userID}> has already been verified for attendance!`);
                 }
-            }
-        }
-        
 
-        handler.setGuildValue('meets', meetings, message.guild);
+                handler.addMeetByMessage(userID, message.guild.id, meet.announcementID, true)
+                .then(n => {
+                    // the thing about whether or not they were detected was mostly a debugging thing, assuming (knock on wood) this works, this is enough.
+                    message.channel.send(`Logged <@!${userID}>'s attendance!`);
+                }).catch(e => console.log(e));
+            } else {                                                                                                                  //code for I don't care to make that work so eat shit and die. yes i'm tired, no I won't go back and manually give one person attendance for one meeting in a club I'm barely affiliated with 
+                message.channel.send(`Sorry! No meet was found on discord today. If the meet you're tyring to log for was before today, there's very little that can be done. Please log on the same day as the meeting.`)
+            }
+        }).catch(e => console.log(e));
     }
 }

@@ -14,15 +14,6 @@ module.exports = {
     execute(message, args) {
         const handler = require('../configHandler');
 
-        // get the list of eligible devs based on their snowflakes (added by hand)
-        var devs = handler.getConfigVar('devs');
-        
-        // only allow the dev team to run this command
-        if (!devs.includes(message.author.id.toString())) {
-            console.log(`${message.author.username} tried to run the reload command but lacked permission. Their id was ${message.author.id} but this doesn't match the eligible dev ids of ${devs}`);
-            return;
-        }
-
         // note that a command is never called if the user can't run it, so checks aren't neccecary. This is an edge case because this is a dev only command
         
         // attempt to find the command

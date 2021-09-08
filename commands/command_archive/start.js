@@ -31,10 +31,10 @@ module.exports = {
                 // fetch the object to store the logs in 
                 var onStart = handler.getGuildValue('on_start', message.guild);
 
-                const channelID = correctChannel.id;
+                const channelId = correctChannel.id;
 
                 // it doesn't matter what was in here before, it needs to be empty
-                onStart[channelID] = {}
+                onStart[channelId] = {}
 
                 message.channel.send(`Starting a meeting in ${correctChannel}`);
 
@@ -42,7 +42,7 @@ module.exports = {
 
                 // everyone "joins" at the same time
                 members.forEach(member => {
-                    onStart[channelID][member.id] = [date];
+                    onStart[channelId][member.id] = [date];
                 });
 
                 handler.setGuildValue('on_start', onStart, message.guild);

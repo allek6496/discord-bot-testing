@@ -1,4 +1,4 @@
-const emailer = require('../emailHandler.js');
+const emailer = require('../functions/emailHandler.js');
 const handler = require('../configHandler.js');
 
 module.exports = {

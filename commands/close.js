@@ -21,26 +21,32 @@ module.exports = {
         var announcementID = await handler.getGuildValue('announcements', message.guild);
         if (announcementID) {
             // fetch the announcements channel
-            var channel = message.guild.channels.resolve(announcementID)
+            var channel = await message.guild.channels.fetch(announcementID).catch(e => console.log(e));
 
-            // go through each active meeting
-            meetings.forEach(meeting => {
-                // if it's active it shouldn't be and delete the message
-                if (meeting.active) {
-                    meeting.active = false;
+            if (channel) {
+                // go through each active meeting
+                meetings.forEach(meeting => {
+                    // if it's active it shouldn't be and delete the message
+                    if (meeting.active) {
+                        meeting.active = false;
 
-                    if ("announcementID" in meeting) {
-                        channel.messages.fetch(meeting.announcementID)
-                        .then(message => {
-                            message.delete()
-                            .catch(e => console.log(`Error deleting attendance message in ${message.guild.name}. Could have been deleted already.`));
-                        });
+                        meeting.save();
+
+                        if ("announcementID" in meeting) {
+                                setTimeout(() => {
+                                    channel.messages.delete(meeting.announcementID)
+                                    .catch(e => console.log(`Error deleting attendance message in ${message.guild.name}. Could have been deleted already.`))
+                                }, 1);
+                                
+                        }
                     }
-                }
-            });
+                });
 
-            message.channel.send('Meetings closed! :octagonal_sign:');
-            handler.setGuildValue('meets', meetings, message.guild);
+                message.channel.send('Meetings closed! :octagonal_sign:');
+                handler.setGuildValue('meets', meetings, message.guild);
+            } else {
+                return message.channel.send("I couldn't find the announcements channel!")
+            }
         } else {
             message.channel.send('There is no defined announcements channel! Please try running ~setup with option 2 to define this channel. :smile:');
         }

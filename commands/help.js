@@ -18,7 +18,7 @@ module.exports = {
         const prefix = await handler.getGuildValue('prefix', message.guild);
         
         const {commands} = message.client;
-        const isDM = message.channel.type != 'text';
+        const isDM = message.channel.type == 'DM';
 
         // stores all the messages to send at once so users have less opportunity to but in. also because the official discord.js tutorial says to do it this way
         const data = [];
@@ -94,7 +94,7 @@ module.exports = {
             data.push(`Here's a list of each of my commands: `);
 
             data.push('> ');
-            var devs = await handler.getConfigVar('devs');
+            var devs = handler.getConfigVar('devs');
 
             handler.getGuildValue("commands", message.guild)
             .then(guildCommands => {
@@ -105,40 +105,44 @@ module.exports = {
                         }
                     }
 
-                    // If they're a dev always show the dev commands
-                    if (devs.includes(message.author.id.toString())) {
-                        data[1] += command.name + ', ';
-                        return true;
-                    }
+                    let show = true;
 
                     if ('permissions' in command) {
                         if (command['permissions'] == "DEV") {
                             // They aren't a dev (case handled) then don't show it to them
-                            return false;
+                            show = false;
                         // Otherwise make sure valid permissions are handled
-                        } else if (message.guild && message.member.permissionsIn(message.channel).has(command['permissions'])) {
-                            return false;
+                        } else if (message.guild && !message.member.permissionsIn(message.channel).has(command['permissions'], true)) {
+                            show = false;           
                         }
                     }
 
                     // if the command specifies required channels, and this is not one of them don't show it. if it specifies no channels, it's fine to show
                     if ('channels' in command) {
-                        if (!(command['channels'].includes(message.channel) && command['channels'].length)) {
-                            return false;
+                        if (command['channels'].length && !(command['channels'].includes(message.channel))) {
+                            show = false;
                         }
                     }
 
                     // if it's ok to use in a dm add the name to the list
                     if (isDM && !command.guildOnly && !command.hideHelp) {
-                        data[1] += command.name + ', ';
-                        return true;
+                        // this doesn't actually do anything, but it's useful for understanding the code
+                        show *= true;
                     // if it's not a dm and it's ok to show, add the name to the list
                     } else if (!isDM && !command.hideHelp) {
-                        data[1] += command.name + ', ';
-                        return true;
+                        show *= true;
                     // if it's neither of these is true, default to not adding.
                     } else {
-                        return false;
+                        show = false;
+                    }
+                
+                    let dev = devs.includes(message.author.id.toString());
+
+                    // If they're a dev always show the dev commands, but indicate which ones wouldn't normally be seen
+                    if (dev && show == false) {
+                        data[1] += '`' + command.name + '`' + ', ';
+                    } else if (show == true) {
+                        data[1] += command.name + ', ';
                     }
                 });
 
@@ -149,8 +153,8 @@ module.exports = {
                 data.push(`\nYou can send \`${prefix}help <command name>\` to get info on a specific command.`)
     
                 // send all the messages at once, possibly splitting into multiple messages
-                return message.channel.send(data, {split: true});
-            }).catch(err => {console.log(`Error while requesting default help command in ${message.guild.name}\n${err}`)});
+                return message.channel.send(data.join('\n'));
+            }).catch(err => {console.log(`Error while requesting command info in ${message.guild.name}\n${err}`)});
 
         // TODO: make this use an embed as well
         } else {
@@ -207,7 +211,7 @@ module.exports = {
             }
 
             // send the messages all at once, like before
-            message.channel.send(data, {split: true});
+            message.channel.send(data.join('\n'));
         }
 
         // message.channel.send(response);

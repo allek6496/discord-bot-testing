@@ -14,6 +14,6 @@ module.exports = {
      */
     execute(message, args) {
         const config = require('../config.json');
-        message.channel.send(JSON.stringify(config), {split: true});
+        message.channel.send(JSON.stringify(config));
     }
 }
