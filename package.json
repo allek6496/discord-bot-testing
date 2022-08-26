@@ -16,7 +16,7 @@
     "firebase-admin": "^9.2.0",
     "fs": "0.0.1-security",
     "line-reader": "^0.4.0",
-    "mongoose": "^6.0.3",
+    "mongoose": "^6.4.6",
     "nodemailer": "^6.4.12",
     "opusscript": "0.0.7",
     "request": "^2.88.2",
